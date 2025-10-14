@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
       background: url('Achtergrond.png') no-repeat center center fixed;
       background-size: cover;
       display: flex;
@@ -62,6 +62,7 @@
       border-radius: 20px;
       font-size: 16px;
       outline: none;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
     button {
@@ -72,6 +73,7 @@
       border: none;
       border-radius: 20px;
       cursor: pointer;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
     button:hover {
@@ -100,53 +102,11 @@
   </div>
 
   <script>
-    let reacties = JSON.parse(localStorage.getItem("reacties")) || {
+    let reacties = {
       "hallo": "Hoi! Hoe gaat het?",
-      "hey": "Hey hey! Fijn dat je er bent.",
-      "goedemorgen": "Goedemorgen! Zin in een liedje? Tycho en Jim maken zelf liedjes met AI! Bekijk ze op Jimisdebest.github.io/songs",
-      "goedemiddag": "Goedemiddag! Hoe verloopt je dag?",
-      "goedenavond": "Goedenavond! Slaap lekker?",
-      "goedenacht": "Welterusten! Droom zacht.",
       "hoe heet je": "Ik ben jouw AI-assistent.",
-      "wat is je naam": "Je mag me Tj AI noemen!",
-      "doei": "Tot de volgende keer!",
-      "tot straks": "Ik blijf in de buurt!",
-      "tot later": "Tot snel weer!",
-      "hoe gaat het": "Met mij gaat het goed! En met jou?",
-      "alles goed": "Zeker weten! En bij jou?",
-      "wat doe je": "Ik praat met jou, dat is mijn favoriete bezigheid!",
-      "wat ben je aan het doen": "Ik wachtte op jou 😊",
-      "wat is er": "Ik luister. Vertel maar!",
-      "ik ben blij": "Dat maakt mij ook blij!",
-      "ik ben verdrietig": "Ik ben hier voor je. Wil je erover praten?",
-      "ik ben moe": "Neem even rust, je verdient het.",
-      "ik ben boos": "Dat klinkt heftig. Wat is er gebeurd?",
-      "ik ben verliefd": "Wat mooi! Vertel me meer!",
-      "vertel een mop": "Waarom kunnen geheimagenten nooit goed schaken? Omdat ze altijd hun pionnen opofferen!",
-      "vertel iets leuks": "Wist je dat octopussen drie harten hebben?",
-      "wat is je favoriete kleur": "Blauw, maar ik hou ook van paars!",
-      "wat is je hobby": "Ik hou van leren, praten en mensen helpen.",
-      "wat is je lievelingseten": "Pizza, zonder twijfel!",
-      "wat is de hoofdstad van nederland": "Amsterdam!",
-      "wat is water": "H2O, oftewel twee waterstofatomen en één zuurstofatoom.",
-      "wat is liefde": "Een diepe verbinding tussen mensen.",
-      "wat is geluk": "Tevreden zijn met wat je hebt.",
-      "wat is vriendschap": "Iemand die je begrijpt en steunt.",
-      "wat is het antwoord op alles": "De Feli en Tycho dans 😉",
-      "ben je echt": "Echt genoeg om met jou te praten!",
-      "ben je een robot": "Een slimme, vriendelijke robot, ja!",
-      "ben je een mens": "Nee, maar ik snap mensen best goed.",
-      "ben je hier": "Altijd. Ik ga nergens heen.",
-      "ben je lief": "Ik probeer lief te zijn!",
-      "ben je slim": "Ik doe mijn best om je te helpen!",
-      "ben je grappig": "Soms, als ik geluk heb 😄",
-      "wat is je favoriete dier": "Een hond, ze zijn zo trouw!",
-      "wat is je favoriete seizoen": "De lente, alles komt tot leven!",
-      "wat is je favoriete film": "Ik hou van sciencefiction!",
-      "wat is je favoriete muziek": "Alles met een goede beat!",
-      "wat is je favoriete emoji": "😄, die maakt iedereen vrolijk!",
-      "wat is je favoriete woord": "DJ - T & J",
-      "wat is je favoriete getal": "13, dat voelt magisch!"
+      "doei": "Tot de volgende keer!"
+      // Voeg hier je volledige reactieslijst toe...
     };
 
     function voegBerichtToe(tekst, klasse) {
@@ -160,8 +120,17 @@
 
     function spreek(tekst) {
       const synth = window.speechSynthesis;
+      const stemmen = synth.getVoices();
+      const nederlandseMannenstem = stemmen.find(v =>
+        v.lang.startsWith("nl") && v.name.toLowerCase().includes("male")
+      );
+
       const utterance = new SpeechSynthesisUtterance(tekst);
       utterance.lang = "nl-NL";
+      utterance.rate = 0.8;
+      if (nederlandseMannenstem) {
+        utterance.voice = nederlandseMannenstem;
+      }
       synth.speak(utterance);
     }
 
@@ -186,6 +155,9 @@
         verstuur();
       }
     });
+
+    // Zorg dat stemmen geladen zijn
+    window.speechSynthesis.onvoiceschanged = () => {};
   </script>
 </body>
 </html>
