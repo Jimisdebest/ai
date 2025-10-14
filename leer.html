@@ -91,17 +91,17 @@
 <body>
   <div class="box">
     <h2>Leer de AI</h2>
-    <p>Gebruik het formaat: <b>zin = reactie</b><br>Je kunt meerdere regels toevoegen.</p>
+    <p>Gebruik het formaat: <b>zin = reactie</p>
     <textarea id="leerInput" placeholder="Bijv: Hallo = Hallo, ik ben een AI."></textarea>
     <br>
     <button onclick="leerAI()">Opslaan</button>
-    <button onclick="resetAI()">Reset AI</button>
+    <button onclick="resetAI()">Resetten</button>
     <button onclick="window.location.href='index.html'">⬅️ Terug naar Chat</button>
 
     <input type="text" id="zoekInput" placeholder="Zoek in kennis..." onkeyup="zoekReacties()" />
 
     <div class="list" id="lijst">
-      <h4>Wat de AI al weet:</h4>
+      <h4>Wat u de AI heeft geleerd:</h4>
       <ul id="reactieLijst"></ul>
     </div>
   </div>
