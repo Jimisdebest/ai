@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>TJ AI Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://sdmntprnortheu.oaiusercontent.com/files/00000000-e6bc-61f4-95e1-3ba9137a7ed7/raw?se=2025-10-14T10%3A20%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=4ec9c889-ff86-58c1-b17f-c9890e4b1ef5&skoid=6658dbdd-f305-4d30-8f6b-d62218202cb9&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-10-14T04%3A00%3A56Z&ske=2025-10-15T04%3A00%3A56Z&sks=b&skv=2024-08-04&sig=8CM7tNunWPy2d1X54uG6PspjxvnhShP7ZpvNg775kAY%3D') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      max-width: 70%;
+      margin-bottom: 10px;
+      padding: 12px 16px;
+      border-radius: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #0078d4;
+      color: white;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background-color: #e5e7eb;
+      color: #333;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-bar {
+      display: flex;
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ccc;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 16px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 0 0 20px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button onclick="window.location.href='leer.html'">Leer de AI</button>
+  </div>
+
+  <div class="chat-container" id="chat"></div>
+
+  <div class="input-bar">
+    <input type="text" id="input" placeholder="Typ hier je bericht..." />
+    <button onclick="verstuur()">Verstuur</button>
+  </div>
+
+  <script>
+    let reacties = JSON.parse(localStorage.getItem("reacties")) || {
+      "hallo": "Hoi! Hoe gaat het?",
+      "hoe heet je": "Ik ben jouw AI-assistent.",
+      "doei": "Tot de volgende keer!"
+    };
+
+    function voegBerichtToe(tekst, klasse) {
+      const chat = document.getElementById("chat");
+      const msg = document.createElement("div");
+      msg.className = `message ${klasse}`;
+      msg.textContent = tekst;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function verstuur() {
+      const input = document.getElementById("input");
+      const tekst = input.value.trim().toLowerCase();
+      if (!tekst) return;
+
+      voegBerichtToe(input.value, "user");
+      input.value = "";
+
+      setTimeout(() => {
+        const reactie = reacties[tekst] || "Dat weet ik nog niet, maar ik leer graag bij!";
+        voegBerichtToe(reactie, "ai");
+      }, 400);
+    }
+
+    document.getElementById("input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter" && this.value.trim() !== "") {
+        e.preventDefault();
+        verstuur();
+      }
+    });
+  </script>
+</body>
+</html>
