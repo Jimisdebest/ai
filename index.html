@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>TJ AI Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Quicksand', sans-serif;
       background: url('Achtergrond.png') no-repeat center center fixed;
       background-size: cover;
       display: flex;
@@ -62,7 +63,7 @@
       border-radius: 20px;
       font-size: 16px;
       outline: none;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Quicksand', sans-serif;
     }
 
     button {
@@ -73,7 +74,7 @@
       border: none;
       border-radius: 20px;
       cursor: pointer;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Quicksand', sans-serif;
     }
 
     button:hover {
@@ -121,15 +122,15 @@
     function spreek(tekst) {
       const synth = window.speechSynthesis;
       const stemmen = synth.getVoices();
-      const nederlandseMannenstem = stemmen.find(v =>
+      const manStem = stemmen.find(v =>
         v.lang.startsWith("nl") && v.name.toLowerCase().includes("male")
       );
 
       const utterance = new SpeechSynthesisUtterance(tekst);
       utterance.lang = "nl-NL";
-      utterance.rate = 0.8;
-      if (nederlandseMannenstem) {
-        utterance.voice = nederlandseMannenstem;
+      utterance.rate = 1.1;
+      if (manStem) {
+        utterance.voice = manStem;
       }
       synth.speak(utterance);
     }
@@ -156,7 +157,6 @@
       }
     });
 
-    // Zorg dat stemmen geladen zijn
     window.speechSynthesis.onvoiceschanged = () => {};
   </script>
 </body>
