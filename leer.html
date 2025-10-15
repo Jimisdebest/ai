@@ -2,12 +2,12 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>TJ AI Leren</title>
+  <title>AI Leren</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://sdmntprnortheu.oaiusercontent.com/files/00000000-e6bc-61f4-95e1-3ba9137a7ed7/raw?se=2025-10-14T10%3A20%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=4ec9c889-ff86-58c1-b17f-c9890e4b1ef5&skoid=6658dbdd-f305-4d30-8f6b-d62218202cb9&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-10-14T04%3A00%3A56Z&ske=2025-10-15T04%3A00%3A56Z&sks=b&skv=2024-08-04&sig=8CM7tNunWPy2d1X54uG6PspjxvnhShP7ZpvNg775kAY%3D') no-repeat center center fixed;
+      background: url('https://sdmntprnortheu.oaiusercontent.com/files/00000000-e6bc-61f4-95e1-3ba9137a7ed7/raw') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       flex-direction: column;
@@ -24,18 +24,7 @@
       width: 500px;
     }
 
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      resize: vertical;
-      font-size: 14px;
-    }
-
-    input {
+    textarea, input {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -91,84 +80,41 @@
 <body>
   <div class="box">
     <h2>Leer de AI</h2>
-    <p>Gebruik het formaat: <b>zin = reactie</p>
-    <textarea id="leerInput" placeholder="Bijv: Hallo = Hallo, ik ben een AI."></textarea>
-    <br>
+    <textarea id="leerInput" placeholder="bijv: Doei = Tot de volgende keer!"></textarea>
     <button onclick="leerAI()">Opslaan</button>
-    <button onclick="resetAI()">Resetten</button>
+    <button onclick="resetAI()">Reset AI</button>
+    <button onclick="exporteer()">Export</button>
+    <input type="file" onchange="importeer(event)" />
     <button onclick="window.location.href='index.html'">⬅️ Terug naar Chat</button>
-
     <input type="text" id="zoekInput" placeholder="Zoek in kennis..." onkeyup="zoekReacties()" />
-
-    <div class="list" id="lijst">
-      <h4>Wat u de AI heeft geleerd:</h4>
-      <ul id="reactieLijst"></ul>
-    </div>
+    <div class="list" id="lijst"><ul id="reactieLijst"></ul></div>
   </div>
 
   <script>
     let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
 
     function leerAI() {
-      const leerInput = document.getElementById("leerInput");
-      const regels = leerInput.value.trim().split("\n");
-
+      const regels = document.getElementById("leerInput").value.trim().split("\n");
       regels.forEach(r => {
         if (r.includes("=")) {
-          const delen = r.split("=");
-          const sleutel = delen[0].trim().toLowerCase();
-          const waarde = delen[1].trim();
-          if (sleutel && waarde) {
-            reacties[sleutel] = waarde; // vervangt automatisch
-          }
+          const [sleutel, waarde] = r.split("=").map(s => s.trim());
+          if (sleutel && waarde) reacties[sleutel.toLowerCase()] = waarde;
         }
       });
-
       localStorage.setItem("reacties", JSON.stringify(reacties));
-      leerInput.value = "";
+      document.getElementById("leerInput").value = "";
       toonReacties();
     }
 
     function resetAI() {
-      if (confirm("Weet je zeker dat je alle kennis wilt wissen?")) {
+      if (confirm("Weet je zeker dat je alles wilt wissen?")) {
         localStorage.removeItem("reacties");
         reacties = {};
         toonReacties();
       }
     }
 
-    function toonReacties(filter = "") {
-      const lijst = document.getElementById("reactieLijst");
-      lijst.innerHTML = "";
+    function exporteer() {
+      let tekst = "";
       for (let key in reacties) {
-        if (key.includes(filter.toLowerCase()) || reacties[key].toLowerCase().includes(filter.toLowerCase())) {
-          const li = document.createElement("li");
-          li.textContent = `"${key}" → "${reacties[key]}"`;
-
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Verwijder";
-          delBtn.className = "delete-btn";
-          delBtn.onclick = () => verwijderReactie(key);
-
-          li.appendChild(delBtn);
-          lijst.appendChild(li);
-        }
-      }
-    }
-
-    function zoekReacties() {
-      const zoekInput = document.getElementById("zoekInput").value;
-      toonReacties(zoekInput);
-    }
-
-    function verwijderReactie(key) {
-      delete reacties[key];
-      localStorage.setItem("reacties", JSON.stringify(reacties));
-      toonReacties();
-    }
-
-    // Toon bij laden
-    toonReacties();
-  </script>
-</body>
-</html>
+        tekst
