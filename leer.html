@@ -7,13 +7,16 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://sdmntprnortheu.oaiusercontent.com/files/00000000-e6bc-61f4-95e1-3ba9137a7ed7/raw') no-repeat center center fixed;
+      background-image: url('Achtergrond.png');
       background-size: cover;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background-position: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background-color: #1e1e1e;
+      background-image: none;
+      color: white;
     }
 
     .box {
@@ -22,6 +25,10 @@
       border-radius: 20px;
       text-align: center;
       width: 500px;
+    }
+
+    body.dark .box {
+      background: rgba(0,0,0,0.7);
     }
 
     textarea, input {
@@ -58,6 +65,11 @@
       font-size: 14px;
     }
 
+    body.dark .list {
+      background: #333;
+      color: white;
+    }
+
     .list li {
       margin: 5px 0;
       display: flex;
@@ -70,6 +82,9 @@
       border-radius: 8px;
       padding: 4px 8px;
       font-size: 12px;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
 
     .delete-btn:hover {
@@ -80,12 +95,13 @@
 <body>
   <div class="box">
     <h2>Leer de AI</h2>
-    <textarea id="leerInput" placeholder="bijv: Doei = Tot de volgende keer!"></textarea>
+    <textarea id="leerInput" placeholder="bijv:\nhallo = Hallo, ik ben een AI\ndoei = Tot de volgende keer!"></textarea>
     <button onclick="leerAI()">Opslaan</button>
     <button onclick="resetAI()">Reset AI</button>
     <button onclick="exporteer()">Export</button>
     <input type="file" onchange="importeer(event)" />
     <button onclick="window.location.href='index.html'">⬅️ Terug naar Chat</button>
+    <button onclick="toggleTheme()">🌗 Thema wisselen</button>
     <input type="text" id="zoekInput" placeholder="Zoek in kennis..." onkeyup="zoekReacties()" />
     <div class="list" id="lijst"><ul id="reactieLijst"></ul></div>
   </div>
@@ -117,4 +133,69 @@
     function exporteer() {
       let tekst = "";
       for (let key in reacties) {
-        tekst
+        tekst += `${key} = ${reacties[key]}\n`;
+      }
+      const blob = new Blob([tekst], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "reacties.txt";
+      link.click();
+    }
+
+    function importeer(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const regels = e.target.result.split("\n");
+        regels.forEach(r => {
+          if (r.includes("=")) {
+            const [sleutel, waarde] = r.split("=").map(s => s.trim());
+            if (sleutel && waarde) reacties[sleutel.toLowerCase()] = waarde;
+          }
+        });
+        localStorage.setItem("reacties", JSON.stringify(reacties));
+        toonReacties();
+      };
+      reader.readAsText(file);
+    }
+
+    function toonReacties(filter = "") {
+      const lijst = document.getElementById("reactieLijst");
+      lijst.innerHTML = "";
+      for (let key in reacties) {
+        if (key.includes(filter.toLowerCase()) || reacties[key].toLowerCase().includes(filter.toLowerCase())) {
+          const li = document.createElement("li");
+          li.textContent = `"${key}" → "${reacties[key]}"`;
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Verwijder";
+          delBtn.className = "delete-btn";
+          delBtn.onclick = () => verwijderReactie(key);
+
+          li.appendChild(delBtn);
+          lijst.appendChild(li);
+        }
+      }
+    }
+
+    function zoekReacties() {
+      const zoekInput = document.getElementById("zoekInput").value;
+      toonReacties(zoekInput);
+    }
+
+    function verwijderReactie(key) {
+      delete reacties[key];
+      localStorage.setItem("reacties", JSON.stringify(reacties));
+      toonReacties();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    // Toon bij laden
+    toonReacties();
+  </script>
+</body>
+</html>
