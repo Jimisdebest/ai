@@ -7,12 +7,16 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://sdmntprnortheu.oaiusercontent.com/files/00000000-e6bc-61f4-95e1-3ba9137a7ed7/raw') no-repeat center center fixed;
+      background-image: url('Achtergrond.png');
       background-size: cover;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      transition: background 0.3s;
+      background-position: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background-color: #1e1e1e;
+      background-image: none;
+      color: white;
     }
 
     .chat-container {
@@ -22,6 +26,7 @@
       justify-content: flex-end;
       padding: 20px;
       overflow-y: auto;
+      height: 80vh;
     }
 
     .message {
@@ -44,6 +49,11 @@
       color: #333;
     }
 
+    body.dark .ai {
+      background-color: #333;
+      color: white;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -54,6 +64,11 @@
       padding: 10px;
       background: white;
       border-top: 1px solid #ccc;
+      border-radius: 0 0 20px 20px;
+    }
+
+    body.dark .input-bar {
+      background: #2c2c2c;
     }
 
     input {
@@ -87,14 +102,8 @@
       border-radius: 0 0 20px 20px;
     }
 
-    .history {
-      font-size: 14px;
-      background: rgba(255,255,255,0.8);
-      padding: 10px;
-      border-radius: 12px;
-      max-height: 100px;
-      overflow-y: auto;
-      margin: 10px;
+    body.dark .top-bar {
+      background: rgba(0,0,0,0.6);
     }
   </style>
 </head>
@@ -105,7 +114,6 @@
   </div>
 
   <div class="chat-container" id="chat"></div>
-  <div class="history" id="history"></div>
 
   <div class="input-bar">
     <input type="text" id="input" placeholder="Typ hier je bericht..." />
@@ -114,7 +122,6 @@
 
   <script>
     let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
-    let geschiedenis = [];
 
     function voegBerichtToe(tekst, klasse) {
       const chat = document.getElementById("chat");
@@ -123,14 +130,6 @@
       msg.textContent = tekst;
       chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
-
-      geschiedenis.push(`${klasse === 'user' ? 'Jij' : 'AI'}: ${tekst}`);
-      if (geschiedenis.length > 10) geschiedenis.shift();
-      toonGeschiedenis();
-    }
-
-    function toonGeschiedenis() {
-      document.getElementById("history").innerHTML = geschiedenis.map(r => `<div>${r}</div>`).join("");
     }
 
     function verstuur() {
