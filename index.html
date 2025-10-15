@@ -126,6 +126,11 @@
   </div>
 
   <script>
+    // Thema toepassen bij laden
+    if (localStorage.getItem("thema") === "donker") {
+      document.body.classList.add("dark");
+    }
+
     let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
 
     function voegBerichtToe(tekst, klasse) {
@@ -161,6 +166,8 @@
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      const huidigThema = document.body.classList.contains("dark") ? "donker" : "licht";
+      localStorage.setItem("thema", huidigThema);
     }
 
     function spreek(tekst) {
