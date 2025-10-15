@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Leren</title>
+  <title>TJ AI Leren</title>
   <style>
     html, body {
       margin: 0;
@@ -203,7 +203,7 @@
     }
 
     function laadReactiesVanGitHub() {
-      fetch("https://raw.githubusercontent.com/<jimisdebest>/<ai>/main/reacties.txt")
+      fetch("https://raw.githubusercontent.com/Jimisdebest/ai/main/reacties.txt")
         .then(response => response.text())
         .then(data => {
           const regels = data.split("\n");
@@ -216,7 +216,7 @@
           localStorage.setItem("reacties", JSON.stringify(reacties));
           toonReacties();
         })
-        .catch(error => console.error("Fout bij laden van GitHub:", error));
+        .catch(error => console.error("Fout bij laden van normale reacties:", error));
     }
 
     // Bij laden van de pagina
