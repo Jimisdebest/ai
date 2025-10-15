@@ -2,12 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>TJ AI Leren</title>
+  <title>Leer de AI</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      overflow: hidden;
     }
 
     body {
@@ -16,9 +17,6 @@
       background-size: cover;
       background-position: center;
       transition: background-image 0.3s ease, color 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     body.dark {
@@ -26,16 +24,21 @@
       color: white;
     }
 
-    .box {
+    .overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
       padding: 20px;
       border-radius: 20px;
-      text-align: center;
       width: 500px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+      z-index: 10;
+      text-align: center;
     }
 
-    body.dark .box {
+    body.dark .overlay {
       background: rgba(0,0,0,0.7);
     }
 
@@ -98,10 +101,28 @@
     .delete-btn:hover {
       background: #b52b27;
     }
+
+    .achtergrond-chat {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.2;
+      z-index: 1;
+      pointer-events: none;
+      background: url('Licht.png') center center / cover no-repeat;
+    }
+
+    body.dark .achtergrond-chat {
+      background: url('Donker.png') center center / cover no-repeat;
+    }
   </style>
 </head>
 <body>
-  <div class="box">
+  <div class="achtergrond-chat"></div>
+
+  <div class="overlay">
     <h2>Leer de AI</h2>
     <textarea id="leerInput" placeholder="bijv: Doei = Tot de volgende keer!"></textarea>
     <button onclick="leerAI()">Opslaan</button>
@@ -115,6 +136,11 @@
   </div>
 
   <script>
+    // Thema toepassen bij laden
+    if (localStorage.getItem("thema") === "donker") {
+      document.body.classList.add("dark");
+    }
+
     let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
 
     function leerAI() {
@@ -200,6 +226,8 @@
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
+      const huidigThema = document.body.classList.contains("dark") ? "donker" : "licht";
+      localStorage.setItem("thema", huidigThema);
     }
 
     function laadReactiesVanGitHub() {
@@ -216,12 +244,12 @@
           localStorage.setItem("reacties", JSON.stringify(reacties));
           toonReacties();
         })
-        .catch(error => console.error("Fout bij laden van normale reacties:", error));
+        .catch(error => console.error("Fout bij laden van GitHub:", error));
     }
 
     // Bij laden van de pagina
     toonReacties();
-    laadReactiesVanGitHub(); // automatisch laden van GitHub
+    laadReactiesVanGitHub();
   </script>
 </body>
 </html>
