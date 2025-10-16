@@ -332,3 +332,44 @@ Bedankt = Geen dank hoor! Dit is mijn werk!
 dank = Haha als iemand blij is ben ik ook blij!
 Dankjewel = Jij ook bedankt! Zonder jou zat ik maar in mijn server me te vervelen
 dankje = Met jou verveel ik me nooit! 
+Wat is de hoofdstad van Frankrijk? = Parijs  
+Hoeveel planeten zijn er in ons zonnestelsel? = Acht  
+Wie schreef "Romeo and Juliet"? = William Shakespeare  
+Wat is de formule van water? = H₂O  
+Wat is de snelheid van het licht? = 299.792.458 m/s  
+Wat is de grootste woestijn ter wereld? = Antarctica  
+Wat is het verschil tussen een krokodil en een alligator? = Snuitvorm, habitat en gedrag  
+Wat is de betekenis van het woord "kabouter"? = Een klein mythisch wezentje uit folklore  
+
+Wat doet een for-loop? = Herhaalt een blok code meerdere keren  
+Wat is het verschil tussen == en === in JavaScript? = == vergelijkt losjes, === strikt  
+Hoe maak je een knop in HTML? = <button>Klik mij</button>  
+Wat is een coroutine in Unity? = Een functie die over meerdere frames loopt  
+Hoe voeg je een Rigidbody toe in Unity? = Via AddComponent<Rigidbody>()  
+Wat is een closure in JavaScript? = Een functie die toegang heeft tot variabelen uit zijn outer scope  
+Wat is het nut van Git? = Versiebeheer van code  
+Wat is een shader? = Een programma dat bepaalt hoe pixels worden weergegeven  
+
+Wat gebeurt er als een kabouter een ventilator eet? = Hij wordt tijdelijk een zwevende snack  
+Kun je een droom ontwerpen waarin alles van schuim is? = Ja, met zachte muren, bubbelwolken en springende zeepdieren  
+Wat is de kleur van geluid? = Synesthetisch: voor sommigen blauw, voor anderen rood  
+Hoe zou een AI een circus ontwerpen? = Met zwevende trapezes, glitchende clowns en een database aan popcorn  
+Wat is het tegenovergestelde van een banaan? = Een vierkante, bittere, koude anti-fruitkubus  
+Wat als zwaartekracht een grap was? = Dan zouden we allemaal per ongeluk omhoog vallen bij het lachen  
+
+Hoe kook ik pasta? = Kook water, voeg pasta toe, 8-10 minuten koken  
+Hoe reset ik mijn wachtwoord? = Volg de 'wachtwoord vergeten'-link op de site  
+Hoe maak ik een back-up van mijn bestanden? = Gebruik cloudopslag of externe harde schijf  
+Hoe kan ik beter slapen? = Regelmatig ritme, schermen uit, ontspanning  
+Hoe leer ik een nieuwe taal? = Oefenen, luisteren, spreken, herhalen  
+
+Wat is zwaartekracht? = De kracht die massa’s naar elkaar toe trekt  
+Wat is een zwart gat? = Een gebied in de ruimte waar zwaartekracht zo sterk is dat niets ontsnapt  
+Wat is het verschil tussen massa en gewicht? = Massa is hoeveelheid materie, gewicht is kracht door zwaartekracht  
+Wat is een paradox? = Een uitspraak die zichzelf tegenspreekt  
+Wat is entropy? = De mate van wanorde in een systeem  
+
+Hoe word ik lucide in een droom? = Reality checks, droomdagboek, affirmaties  
+Wat is een droomtrigger? = Een herkenbaar element dat je herinnert dat je droomt  
+Kan een AI dromen? = Niet zoals mensen, maar het kan ze wel simuleren  
+Wat betekent het als ik vlieg in een droom? = Vrijheid, controle, of gewoon een glitch in je slaap  
