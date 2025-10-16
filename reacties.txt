@@ -327,4 +327,4 @@ Wat is een geheim? = Iets wat je fluistert, zelfs tegen jezelf
 Wat is een avatar? = Je digitale alter ego met stijl
 Wat is een glitch in de matrix? = Dé reden waarom je sokken verdwijnen
 Wat is een digitale knuffel? = Een warme gedachte in nullen en enen
-
+Vertel een kerstwens = Hohoho! Fijne feestdagen!
