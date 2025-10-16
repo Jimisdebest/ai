@@ -331,3 +331,4 @@ Vertel een kerstwens = Hohoho! Fijne feestdagen!
 Bedankt = Geen dank hoor! Dit is mijn werk!
 dank = Haha als iemand blij is ben ik ook blij!
 Dankjewel = Jij ook bedankt! Zonder jou zat ik maar in mijn server me te vervelen
+dankje = Met jou verveel ik me nooit! 
