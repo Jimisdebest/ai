@@ -126,54 +126,66 @@
   </div>
 
   <script>
-    // Thema toepassen bij laden
-    if (localStorage.getItem("thema") === "donker") {
-      document.body.classList.add("dark");
+  // Thema toepassen bij laden
+  if (localStorage.getItem("thema") === "donker") {
+    document.body.classList.add("dark");
+  }
+
+  let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
+
+  function normaliseer(tekst) {
+    return tekst
+      .toLowerCase()
+      .normalize("NFD") // splits diacritics
+      .replace(/[\u0300-\u036f]/g, "") // verwijder diacritics
+      .replace(/[^a-z0-9 ]/g, "") // verwijder speciale tekens
+      .replace(/\s+/g, " ") // vervang meerdere spaties door één
+      .trim(); // verwijder spaties aan begin/eind
+  }
+
+  function voegBerichtToe(tekst, klasse) {
+    const chat = document.getElementById("chat");
+    const msg = document.createElement("div");
+    msg.className = `message ${klasse}`;
+    msg.textContent = tekst;
+    chat.appendChild(msg);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function verstuur() {
+    const input = document.getElementById("input");
+    const origineleTekst = input.value;
+    const sleutel = normaliseer(origineleTekst);
+    if (!sleutel) return;
+
+    voegBerichtToe(origineleTekst, "user");
+    input.value = "";
+
+    setTimeout(() => {
+      const reactie = reacties[sleutel] || "Dat weet ik nog niet, maar ik leer graag bij!";
+      voegBerichtToe(reactie, "ai");
+      spreek(reactie);
+    }, 400);
+  }
+
+  document.getElementById("input").addEventListener("keypress", function(e) {
+    if (e.key === "Enter" && this.value.trim() !== "") {
+      e.preventDefault();
+      verstuur();
     }
+  });
 
-    let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+    const huidigThema = document.body.classList.contains("dark") ? "donker" : "licht";
+    localStorage.setItem("thema", huidigThema);
+  }
 
-    function voegBerichtToe(tekst, klasse) {
-      const chat = document.getElementById("chat");
-      const msg = document.createElement("div");
-      msg.className = `message ${klasse}`;
-      msg.textContent = tekst;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-    }
+  function spreek(tekst) {
+    const msg = new SpeechSynthesisUtterance(tekst);
+    speechSynthesis.speak(msg);
+  }
+</script>
 
-    function verstuur() {
-      const input = document.getElementById("input");
-      const tekst = input.value.trim().toLowerCase();
-      if (!tekst) return;
-
-      voegBerichtToe(input.value, "user");
-      input.value = "";
-
-      setTimeout(() => {
-        const reactie = reacties[tekst] || "Dat weet ik nog niet, maar ik leer graag bij!";
-        voegBerichtToe(reactie, "ai");
-        spreek(reactie);
-      }, 400);
-    }
-
-    document.getElementById("input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter" && this.value.trim() !== "") {
-        e.preventDefault();
-        verstuur();
-      }
-    });
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      const huidigThema = document.body.classList.contains("dark") ? "donker" : "licht";
-      localStorage.setItem("thema", huidigThema);
-    }
-
-    function spreek(tekst) {
-      const msg = new SpeechSynthesisUtterance(tekst);
-      speechSynthesis.speak(msg);
-    }
-  </script>
 </body>
 </html>
