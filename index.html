@@ -40,6 +40,10 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            background-image: var(--background-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
         .container {
@@ -182,6 +186,12 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .dark-mode .chat-history {
+            background-color: rgba(45, 45, 45, 0.9);
         }
 
         .message {
@@ -240,10 +250,13 @@
             font-size: 16px;
             transition: var(--transition);
             box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
         }
 
         .dark-mode .chat-input {
             border-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(45, 45, 45, 0.9);
         }
 
         .chat-input:focus {
@@ -265,6 +278,8 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            background-color: rgba(74, 111, 165, 0.9);
         }
 
         .send-button:hover {
@@ -339,6 +354,12 @@
             animation: fadeIn 0.3s ease;
             max-height: 90vh;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .dark-mode .modal-content {
+            background-color: rgba(45, 45, 45, 0.95);
         }
 
         .modal-header {
@@ -885,6 +906,10 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
             let chats = JSON.parse(localStorage.getItem('chats')) || {};
             let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [];
             let currentFileContent = '';
+
+            // Achtergrond afbeeldingen
+            const lightBackground = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23f0f8ff\"/><circle cx=\"20\" cy=\"20\" r=\"5\" fill=\"%234a6fa5\" opacity=\"0.3\"/><circle cx=\"80\" cy=\"40\" r=\"8\" fill=\"%234a6fa5\" opacity=\"0.2\"/><circle cx=\"40\" cy=\"80\" r=\"6\" fill=\"%234a6fa5\" opacity=\"0.4\"/></svg>')";
+            const darkBackground = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%231a1a2e\"/><circle cx=\"30\" cy=\"30\" r=\"4\" fill=\"%236b8cbc\" opacity=\"0.4\"/><circle cx=\"70\" cy=\"20\" r=\"7\" fill=\"%236b8cbc\" opacity=\"0.3\"/><circle cx=\"20\" cy=\"70\" r=\"5\" fill=\"%236b8cbc\" opacity=\"0.5\"/></svg>')";
             
             // Initialiseer de interface
             initializeInterface();
@@ -895,8 +920,10 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
                 if (isDarkMode) {
                     document.body.classList.add('dark-mode');
                     updateThemeIcon(true);
+                    document.body.style.setProperty('--background-image', darkBackground);
                 } else {
                     updateThemeIcon(false);
+                    document.body.style.setProperty('--background-image', lightBackground);
                 }
                 
                 // Laad knowledge base van GitHub
@@ -925,11 +952,12 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
                         // Toon melding
                         if (result.importedCount > 0) {
                             addMessageToChat(`Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`, 'bot');
-                            chatHistoryData.push({
+                            chats[currentChatId].messages.push({
                                 message: `Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`,
                                 sender: 'bot',
                                 timestamp: new Date().toISOString()
                             });
+                            localStorage.setItem('chats', JSON.stringify(chats));
                         }
                     }
                 } catch (error) {
@@ -945,7 +973,14 @@ Wat is je naam = Ik ben de Slimme Chatbot, aangenaam kennis te maken!
 Wat kun je doen = Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu.
 Hallo = Hallo! Waar wilt u het over hebben?
 Hoi = Hoi! Goed je te zien!
-Hey = Hey daar!`;
+Hey = Hey daar!
+reken = Ik open de rekenmachine in een nieuw tabblad voor je!
+rekenen = Hier open ik de rekenmachine voor berekeningen!
+bereken = Ik open de rekenmachine om je te helpen met berekeningen!
+calculator = Hier is de rekenmachine!
+tel op = Ik open de rekenmachine voor optellingen!
+vermenigvuldig = De rekenmachine kan vermenigvuldigen voor je!
+deel = Ik open de rekenmachine voor delingen!`;
                 
                 if (knowledgeBase.length === 0) {
                     const defaultQA = parseMultipleQA(defaultResponses);
@@ -960,10 +995,12 @@ Hey = Hey daar!`;
                     themeIcon.classList.remove('light-icon');
                     themeIcon.classList.add('dark-icon');
                     themeToggle.querySelector('span').textContent = 'Licht modus';
+                    document.body.style.setProperty('--background-image', darkBackground);
                 } else {
                     themeIcon.classList.remove('dark-icon');
                     themeIcon.classList.add('light-icon');
                     themeToggle.querySelector('span').textContent = 'Donker modus';
+                    document.body.style.setProperty('--background-image', lightBackground);
                 }
             }
             
@@ -1067,7 +1104,23 @@ Hey = Hey daar!`;
                 
                 localStorage.setItem('chats', JSON.stringify(chats));
                 
-                // Simuleer denktijd
+                // Controleer of het een rekenvraag is
+                if (isMathQuestion(message)) {
+                    // Open rekenmachine in nieuw tabblad
+                    setTimeout(() => {
+                        openCalculatorInNewTab();
+                        addMessageToChat("Ik open de rekenmachine in een nieuw tabblad voor je! Je kunt daar berekeningen maken.", 'bot');
+                        chats[currentChatId].messages.push({
+                            message: "Ik open de rekenmachine in een nieuw tabblad voor je! Je kunt daar berekeningen maken.",
+                            sender: 'bot',
+                            timestamp: new Date().toISOString()
+                        });
+                        localStorage.setItem('chats', JSON.stringify(chats));
+                    }, 1000);
+                    return;
+                }
+                
+                // Simuleer denktijd voor normale vragen
                 setTimeout(() => {
                     const response = generateBotResponse(message);
                     addMessageToChat(response.answer, 'bot', response.analysis);
@@ -1082,6 +1135,18 @@ Hey = Hey daar!`;
                     
                     localStorage.setItem('chats', JSON.stringify(chats));
                 }, 1000 + Math.random() * 1000);
+            }
+            
+            function isMathQuestion(message) {
+                const mathKeywords = ['reken', 'bereken', 'calculator', 'tel op', 'vermenigvuldig', 'deel', 'plus', 'min', 'keer', 'gedeeld door', 'som', 'optellen', 'aftrekken', 'vermenigvuldigen', 'delen'];
+                const lowerMessage = message.toLowerCase();
+                return mathKeywords.some(keyword => lowerMessage.includes(keyword));
+            }
+            
+            function openCalculatorInNewTab() {
+                // Open de echte rekenmachine in een nieuw tabblad linksonder
+                const calculatorUrl = 'https://jimisdebest.github.io/welkom/rekenmachine.html';
+                window.open(calculatorUrl, '_blank', 'width=400,height=600,left=0,top=screen.height-600');
             }
             
             function generateBotResponse(message) {
@@ -1266,8 +1331,7 @@ Hey = Hey daar!`;
                     githubStatus.innerHTML = `<div style="color: green;">✅ Succesvol geladen! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
                     
                     setTimeout(() => {
-                        githubModal.classList.remove('open');
-                        overlay.classList.remove('open');
+                        closeAllModals();
                         
                         addMessageToChat(`GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`, 'bot');
                         chats[currentChatId].messages.push({
@@ -1292,8 +1356,7 @@ Hey = Hey daar!`;
                 // Schakel naar nieuwe chat
                 currentChatId = chatId;
                 renderChatHistory();
-                menu.classList.remove('open');
-                overlay.classList.remove('open');
+                closeAllModals();
             }
             
             function deleteChat(chatId) {
@@ -1326,8 +1389,7 @@ Hey = Hey daar!`;
                 };
                 localStorage.setItem('chats', JSON.stringify(chats));
                 renderChatHistory();
-                menu.classList.remove('open');
-                overlay.classList.remove('open');
+                closeAllModals();
             }
             
             function saveCurrentChat() {
@@ -1342,12 +1404,22 @@ Hey = Hey daar!`;
                     resetCurrentChat();
                     loadChats();
                     
-                    saveChatModal.classList.remove('open');
-                    overlay.classList.remove('open');
+                    closeAllModals();
                     chatNameInput.value = '';
                 } else {
                     alert('Voer een naam in voor de chat.');
                 }
+            }
+            
+            function closeAllModals() {
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+                learnChoiceModal.classList.remove('open');
+                singleQuestionModal.classList.remove('open');
+                multipleQuestionsModal.classList.remove('open');
+                importTxtModal.classList.remove('open');
+                githubModal.classList.remove('open');
+                saveChatModal.classList.remove('open');
             }
             
             // Event listeners
@@ -1357,19 +1429,11 @@ Hey = Hey daar!`;
             });
             
             closeMenu.addEventListener('click', function() {
-                menu.classList.remove('open');
-                overlay.classList.remove('open');
+                closeAllModals();
             });
             
             overlay.addEventListener('click', function() {
-                menu.classList.remove('open');
-                overlay.classList.remove('open');
-                learnChoiceModal.classList.remove('open');
-                singleQuestionModal.classList.remove('open');
-                multipleQuestionsModal.classList.remove('open');
-                importTxtModal.classList.remove('open');
-                githubModal.classList.remove('open');
-                saveChatModal.classList.remove('open');
+                closeAllModals();
             });
             
             themeToggle.addEventListener('click', function() {
@@ -1377,11 +1441,11 @@ Hey = Hey daar!`;
                 document.body.classList.toggle('dark-mode', isDarkMode);
                 updateThemeIcon(isDarkMode);
                 localStorage.setItem('darkMode', isDarkMode);
+                closeAllModals();
             });
             
             newChatBtn.addEventListener('click', function() {
                 startNewChat();
-                menu.classList.remove('open');
             });
             
             toggleAnalysisBtn.addEventListener('click', function() {
@@ -1389,12 +1453,11 @@ Hey = Hey daar!`;
                 updateAnalysisButton();
                 localStorage.setItem('showAnalysis', showAnalysis);
                 renderChatHistory();
-                menu.classList.remove('open');
+                closeAllModals();
             });
             
             teachChatbotBtn.addEventListener('click', function() {
                 learnChoiceModal.classList.add('open');
-                menu.classList.remove('open');
             });
             
             // Keuze knoppen
@@ -1427,40 +1490,39 @@ Hey = Hey daar!`;
                 loadGithub.disabled = false;
             });
             
-            // Annuleer knoppen
+            // Annuleer knoppen - gaan direct terug naar chat
             cancelLearnChoice.addEventListener('click', function() {
-                learnChoiceModal.classList.remove('open');
+                closeAllModals();
             });
             
             cancelSingle.addEventListener('click', function() {
-                singleQuestionModal.classList.remove('open');
+                closeAllModals();
             });
             
             cancelMultiple.addEventListener('click', function() {
-                multipleQuestionsModal.classList.remove('open');
+                closeAllModals();
             });
             
             cancelImport.addEventListener('click', function() {
-                importTxtModal.classList.remove('open');
+                closeAllModals();
             });
             
             cancelGithub.addEventListener('click', function() {
-                githubModal.classList.remove('open');
+                closeAllModals();
             });
             
             cancelSaveChat.addEventListener('click', function() {
-                saveChatModal.classList.remove('open');
+                closeAllModals();
             });
             
-            // Opslaan knoppen
+            // Opslaan knoppen - gaan direct terug naar chat na opslaan
             saveSingle.addEventListener('click', function() {
                 const question = document.getElementById('teach-question').value.trim();
                 const answer = document.getElementById('teach-answer').value.trim();
                 
                 if (question && answer) {
                     saveToKnowledgeBase(question, answer);
-                    singleQuestionModal.classList.remove('open');
-                    overlay.classList.remove('open');
+                    closeAllModals();
                 } else {
                     alert('Vul zowel een vraag als een antwoord in.');
                 }
@@ -1478,8 +1540,7 @@ Hey = Hey daar!`;
                         savedCount++;
                     });
                     
-                    multipleQuestionsModal.classList.remove('open');
-                    overlay.classList.remove('open');
+                    closeAllModals();
                     
                     addMessageToChat(`Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!`, 'bot');
                     chats[currentChatId].messages.push({
@@ -1511,8 +1572,7 @@ Hey = Hey daar!`;
             saveImport.addEventListener('click', function() {
                 if (currentFileContent) {
                     const result = importFromFile(currentFileContent);
-                    importTxtModal.classList.remove('open');
-                    overlay.classList.remove('open');
+                    closeAllModals();
                     
                     addMessageToChat(`Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`, 'bot');
                     chats[currentChatId].messages.push({
@@ -1554,6 +1614,13 @@ Hey = Hey daar!`;
             chatInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     sendButton.click();
+                }
+            });
+
+            // Sluit modals met Escape toets
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllModals();
                 }
             });
         });
