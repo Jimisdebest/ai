@@ -1042,3 +1042,4 @@ Wat is de tegenhanger van slim? = Dom
 Hoeveel minuten in een miljoen jaar? = 525600000000
 Wat is de hoofdstad van Tonga? = Nuku'alofa
 Hoeveel noten in een hele toonladder? = 8
+Kan jij nadenken? = Als jij de analyse aanzet kan ik gedeeltelijk nadenken ja!
