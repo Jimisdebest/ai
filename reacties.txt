@@ -340,7 +340,7 @@ Wat is de snelheid van het licht? = 299.792.458 m/s
 Wat is de grootste woestijn ter wereld? = Antarctica  
 Wat is het verschil tussen een krokodil en een alligator? = Snuitvorm, habitat en gedrag  
 Wat is de betekenis van het woord "kabouter"? = Een klein mythisch wezentje uit folklore  
-
+Ben jij een ai? = Nee, maar ik ben wel heeeeeeeeeeeeel slim!
 Wat doet een for-loop? = Herhaalt een blok code meerdere keren  
 Wat is het verschil tussen == en === in JavaScript? = == vergelijkt losjes, === strikt  
 Hoe maak je een knop in HTML? = <button>Klik mij</button>  
