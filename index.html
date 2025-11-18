@@ -334,7 +334,7 @@
             border-radius: 12px;
             padding: 25px;
             width: 90%;
-            max-width: 600px;
+            max-width: 500px;
             box-shadow: var(--shadow);
             animation: fadeIn 0.3s ease;
             max-height: 90vh;
@@ -554,6 +554,85 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Chat selectie styling */
+        .chat-list {
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .chat-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .delete-chat {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .chat-item:hover .delete-chat {
+            opacity: 1;
+        }
+
+        .chat-item.active .delete-chat {
+            color: white;
+        }
+
+        .delete-chat:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+        }
+
+        /* Keuze knoppen voor leren */
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .choice-button {
+            padding: 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            background: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .choice-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -582,11 +661,10 @@
         <div class="menu-item" id="teach-chatbot">
             <span>Leer de chatbot</span>
         </div>
-        <div class="menu-item" id="import-responses">
-            <span>Importeer reacties.txt</span>
-        </div>
-        <div class="menu-item" id="load-from-github">
-            <span>Laad van GitHub</span>
+        
+        <div class="menu-section-title" style="margin-top: 20px; font-weight: bold; color: var(--primary-color);">Andere chats</div>
+        <div class="chat-list" id="chat-list">
+            <!-- Chat items worden hier dynamisch toegevoegd -->
         </div>
     </div>
 
@@ -608,66 +686,93 @@
         </div>
     </div>
 
-    <div class="modal" id="teach-modal">
+    <!-- Modals -->
+    <div class="modal" id="learn-choice-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Leer de chatbot</div>
+                <div class="modal-title">Hoe wilt u de AI leren?</div>
                 <button class="close-modal">×</button>
             </div>
             
-            <div class="modal-section">
-                <div class="modal-section-title">Enkele vraag toevoegen</div>
-                <p>Dit is mijn vraag:</p>
-                <input type="text" class="modal-input" id="teach-question" placeholder="Typ je vraag hier...">
-                <p>Dit is het antwoord op die vraag:</p>
-                <input type="text" class="modal-input" id="teach-answer" placeholder="Typ het antwoord hier...">
-            </div>
-            
-            <div class="modal-section">
-                <div class="modal-section-title">Of voeg hier snel meerdere toe</div>
-                <p>Voeg meerdere vraag-antwoord paren toe in dit formaat:</p>
-                <textarea class="modal-textarea" id="multiple-qa" placeholder="Vraag = Antwoord
-Bijvoorbeeld:
-Hoe gaat het = Met mij gaat het goed!
-Wat is je naam = Ik ben de chatbot!"></textarea>
-                <div class="example-text">
-                    Formaat: elke regel bevat een vraag, gevolgd door " = " en dan het antwoord.
-                </div>
+            <div class="choice-buttons">
+                <button class="choice-button" id="single-question-btn">Enkele vraag toevoegen</button>
+                <button class="choice-button" id="multiple-questions-btn">Meerdere vragen toevoegen</button>
+                <button class="choice-button" id="import-txt-btn">TXT bestand importeren</button>
+                <button class="choice-button" id="load-github-btn">Laden van GitHub</button>
             </div>
             
             <div class="modal-buttons">
-                <button class="modal-button cancel" id="cancel-teach">Annuleren</button>
-                <button class="modal-button save" id="save-teach">Opslaan</button>
+                <button class="modal-button cancel" id="cancel-learn-choice">Annuleren</button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="import-modal">
+    <div class="modal" id="single-question-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Importeer reacties.txt</div>
+                <div class="modal-title">Enkele vraag toevoegen</div>
                 <button class="close-modal">×</button>
             </div>
             
-            <div class="modal-section">
-                <p>Upload een reacties.txt bestand met vraag-antwoord paren in dit formaat:</p>
-                <div class="example-text">
-                    Vraag = Antwoord<br>
-                    Vraag = Antwoord<br>
-                    ...
-                </div>
-                
-                <div class="file-input-container">
-                    <label for="file-input" class="file-input-label">
-                        Kies reacties.txt bestand
-                    </label>
-                    <input type="file" id="file-input" class="file-input" accept=".txt">
-                </div>
-                
-                <div id="file-content" style="display: none; margin-top: 15px;">
-                    <div class="modal-section-title">Voorbeeld van geïmporteerde reacties:</div>
-                    <div id="file-preview" class="modal-textarea" style="min-height: 100px; background-color: rgba(0,0,0,0.05);"></div>
-                </div>
+            <p>Dit is mijn vraag:</p>
+            <input type="text" class="modal-input" id="teach-question" placeholder="Typ je vraag hier...">
+            <p>Dit is het antwoord op die vraag:</p>
+            <input type="text" class="modal-input" id="teach-answer" placeholder="Typ het antwoord hier...">
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-single">Annuleren</button>
+                <button class="modal-button save" id="save-single">Opslaan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="multiple-questions-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Meerdere vragen toevoegen</div>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <p>Voeg meerdere vraag-antwoord paren toe in dit formaat:</p>
+            <textarea class="modal-textarea" id="multiple-qa" placeholder="Vraag = Antwoord
+Bijvoorbeeld:
+Hoe gaat het = Met mij gaat het goed!
+Wat is je naam = Ik ben de chatbot!"></textarea>
+            <div class="example-text">
+                Formaat: elke regel bevat een vraag, gevolgd door " = " en dan het antwoord.
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-multiple">Annuleren</button>
+                <button class="modal-button save" id="save-multiple">Opslaan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-txt-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">TXT bestand importeren</div>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <p>Upload een reacties.txt bestand met vraag-antwoord paren in dit formaat:</p>
+            <div class="example-text">
+                Vraag = Antwoord<br>
+                Vraag = Antwoord<br>
+                ...
+            </div>
+            
+            <div class="file-input-container">
+                <label for="file-input" class="file-input-label">
+                    Kies reacties.txt bestand
+                </label>
+                <input type="file" id="file-input" class="file-input" accept=".txt">
+            </div>
+            
+            <div id="file-content" style="display: none; margin-top: 15px;">
+                <div class="modal-section-title">Voorbeeld van geïmporteerde reacties:</div>
+                <div id="file-preview" class="modal-textarea" style="min-height: 100px; background-color: rgba(0,0,0,0.05);"></div>
             </div>
             
             <div class="modal-buttons">
@@ -680,28 +785,42 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
     <div class="modal" id="github-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Laad reacties van GitHub</div>
+                <div class="modal-title">Laden van GitHub</div>
                 <button class="close-modal">×</button>
             </div>
             
-            <div class="modal-section">
-                <p>Voer de GitHub RAW URL in van het reacties.txt bestand:</p>
-                <div class="github-input-container">
-                    <input type="text" class="github-input" id="github-url" 
-                           placeholder="https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt"
-                           value="https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt">
-                </div>
-                
-                <div class="example-text">
-                    Voorbeeld: https://raw.githubusercontent.com/username/repo/main/reacties.txt
-                </div>
-                
-                <div id="github-status" style="margin-top: 15px;"></div>
+            <p>Voer de GitHub RAW URL in van het reacties.txt bestand:</p>
+            <div class="github-input-container">
+                <input type="text" class="github-input" id="github-url" 
+                       value="https://raw.githubusercontent.com/jimisdebest/ai/main/reacties.txt">
             </div>
+            
+            <div class="example-text">
+                Standaard wordt geprobeerd: https://raw.githubusercontent.com/jimisdebest/ai/main/reacties.txt
+            </div>
+            
+            <div id="github-status" style="margin-top: 15px;"></div>
             
             <div class="modal-buttons">
                 <button class="modal-button cancel" id="cancel-github">Annuleren</button>
                 <button class="modal-button save" id="load-github">Laden</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="save-chat-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Nieuwe chat</div>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <p>Hoe wilt u de oude chat noemen?</p>
+            <input type="text" class="modal-input" id="chat-name" placeholder="Voer chat naam in...">
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-save-chat">Annuleren</button>
+                <button class="modal-button save" id="save-chat">Opslaan</button>
             </div>
         </div>
     </div>
@@ -717,18 +836,38 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
             const newChatBtn = document.getElementById('new-chat');
             const toggleAnalysisBtn = document.getElementById('toggle-analysis');
             const teachChatbotBtn = document.getElementById('teach-chatbot');
-            const importResponsesBtn = document.getElementById('import-responses');
-            const loadFromGithubBtn = document.getElementById('load-from-github');
-            const teachModal = document.getElementById('teach-modal');
-            const importModal = document.getElementById('import-modal');
+            const chatList = document.getElementById('chat-list');
+            
+            // Modal elementen
+            const learnChoiceModal = document.getElementById('learn-choice-modal');
+            const singleQuestionModal = document.getElementById('single-question-modal');
+            const multipleQuestionsModal = document.getElementById('multiple-questions-modal');
+            const importTxtModal = document.getElementById('import-txt-modal');
             const githubModal = document.getElementById('github-modal');
-            const closeTeachModal = document.querySelector('.close-modal');
-            const cancelTeachBtn = document.getElementById('cancel-teach');
-            const saveTeachBtn = document.getElementById('save-teach');
-            const cancelImportBtn = document.getElementById('cancel-import');
-            const saveImportBtn = document.getElementById('save-import');
-            const cancelGithubBtn = document.getElementById('cancel-github');
-            const loadGithubBtn = document.getElementById('load-github');
+            const saveChatModal = document.getElementById('save-chat-modal');
+            
+            // Keuze knoppen
+            const singleQuestionBtn = document.getElementById('single-question-btn');
+            const multipleQuestionsBtn = document.getElementById('multiple-questions-btn');
+            const importTxtBtn = document.getElementById('import-txt-btn');
+            const loadGithubBtn = document.getElementById('load-github-btn');
+            
+            // Annuleer knoppen
+            const cancelLearnChoice = document.getElementById('cancel-learn-choice');
+            const cancelSingle = document.getElementById('cancel-single');
+            const cancelMultiple = document.getElementById('cancel-multiple');
+            const cancelImport = document.getElementById('cancel-import');
+            const cancelGithub = document.getElementById('cancel-github');
+            const cancelSaveChat = document.getElementById('cancel-save-chat');
+            
+            // Opslaan knoppen
+            const saveSingle = document.getElementById('save-single');
+            const saveMultiple = document.getElementById('save-multiple');
+            const saveImport = document.getElementById('save-import');
+            const loadGithub = document.getElementById('load-github');
+            const saveChat = document.getElementById('save-chat');
+            
+            // Andere elementen
             const fileInput = document.getElementById('file-input');
             const filePreview = document.getElementById('file-preview');
             const fileContent = document.getElementById('file-content');
@@ -737,31 +876,16 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
             const chatInput = document.getElementById('chat-input');
             const sendButton = document.getElementById('send-button');
             const chatHistory = document.getElementById('chat-history');
+            const chatNameInput = document.getElementById('chat-name');
             
             // Status variabelen
             let isDarkMode = localStorage.getItem('darkMode') === 'true';
             let showAnalysis = localStorage.getItem('showAnalysis') !== 'false';
-            let chatHistoryData = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            let currentChatId = 'current';
+            let chats = JSON.parse(localStorage.getItem('chats')) || {};
             let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [];
             let currentFileContent = '';
             
-            // Standaard GitHub URL - kan aangepast worden
-            const defaultGithubUrl = "https://raw.githubusercontent.com/jouw-gebruikersnaam/jouw-repository/main/reacties.txt";
-            
-            // Standaard reacties als knowledgeBase leeg is
-            const defaultResponses = `Hoe gaat het = Met mij gaat het goed! Hoe gaat het met jou?
-Wat is je naam = Ik ben de Slimme Chatbot, aangenaam kennis te maken!
-Wat kun je doen = Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu.
-Hallo = Hallo! Waar wilt u het over hebben?
-Hoi = Hoi! Goed je te zien!
-Hey = Hey daar!
-Wie heeft je gemaakt = Ik ben gemaakt door een getalenteerde ontwikkelaar!
-Wat is de betekenis van het leven = Dat is een diepe vraag! Ik denk dat het leven draait om leren, groeien en verbinden met anderen.
-Vertel me een grap = Waarom konden de computers niet naar de feest? Omdat ze te veel bugs hadden!
-Help = Ik kan je helpen met het beantwoorden van vragen. Stel me gewoon een vraag en ik zal mijn best doen!
-Dankjewel = Graag gedaan! Blijf vragen stellen!
-Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
-
             // Initialiseer de interface
             initializeInterface();
             
@@ -775,50 +899,58 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                     updateThemeIcon(false);
                 }
                 
-                // Laad knowledge base of gebruik standaard
-                if (knowledgeBase.length === 0) {
-                    const defaultQA = parseMultipleQA(defaultResponses);
-                    knowledgeBase = defaultQA;
-                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                    
-                    // Probeer automatisch van GitHub te laden
-                    autoLoadFromGithub();
-                }
+                // Laad knowledge base van GitHub
+                loadKnowledgeBaseFromGitHub();
                 
-                // Laad chatgeschiedenis
-                loadChatHistory();
+                // Laad chats
+                loadChats();
+                
+                // Laad huidige chat
+                loadCurrentChat();
                 
                 // Stel analyseweergave in
                 updateAnalysisButton();
             }
             
-            async function autoLoadFromGithub() {
-                // Probeer een standaard GitHub URL (kan aangepast worden)
-                const defaultUrls = [
-                    "https://raw.githubusercontent.com/jouw-gebruikersnaam/jouw-repository/main/reacties.txt",
-                    "https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt"
-                ];
+            async function loadKnowledgeBaseFromGitHub() {
+                // Probeer eerst de opgegeven GitHub URL
+                const githubUrl = "https://raw.githubusercontent.com/jimisdebest/ai/main/reacties.txt";
                 
-                for (const url of defaultUrls) {
-                    try {
-                        const response = await fetch(url);
-                        if (response.ok) {
-                            const content = await response.text();
-                            const result = importFromFile(content);
-                            
-                            // Toon melding
+                try {
+                    const response = await fetch(githubUrl);
+                    if (response.ok) {
+                        const content = await response.text();
+                        const result = importFromFile(content);
+                        
+                        // Toon melding
+                        if (result.importedCount > 0) {
                             addMessageToChat(`Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`, 'bot');
                             chatHistoryData.push({
                                 message: `Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`,
                                 sender: 'bot',
                                 timestamp: new Date().toISOString()
                             });
-                            
-                            break;
                         }
-                    } catch (error) {
-                        console.log(`Kon niet laden van ${url}:`, error);
                     }
+                } catch (error) {
+                    console.log('Kon niet laden van GitHub:', error);
+                    // Gebruik standaard reacties als backup
+                    loadDefaultResponses();
+                }
+            }
+            
+            function loadDefaultResponses() {
+                const defaultResponses = `Hoe gaat het = Met mij gaat het goed! Hoe gaat het met jou?
+Wat is je naam = Ik ben de Slimme Chatbot, aangenaam kennis te maken!
+Wat kun je doen = Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu.
+Hallo = Hallo! Waar wilt u het over hebben?
+Hoi = Hoi! Goed je te zien!
+Hey = Hey daar!`;
+                
+                if (knowledgeBase.length === 0) {
+                    const defaultQA = parseMultipleQA(defaultResponses);
+                    knowledgeBase = defaultQA;
+                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 }
             }
             
@@ -843,17 +975,56 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 }
             }
             
-            function loadChatHistory() {
+            function loadChats() {
+                chatList.innerHTML = '';
+                
+                Object.keys(chats).forEach(chatId => {
+                    if (chatId !== 'current') {
+                        const chatItem = document.createElement('div');
+                        chatItem.classList.add('chat-item');
+                        chatItem.innerHTML = `
+                            <span>${chats[chatId].name}</span>
+                            <button class="delete-chat" data-chatid="${chatId}">🗑️</button>
+                        `;
+                        
+                        chatItem.addEventListener('click', function(e) {
+                            if (!e.target.classList.contains('delete-chat')) {
+                                switchToChat(chatId);
+                            }
+                        });
+                        
+                        const deleteBtn = chatItem.querySelector('.delete-chat');
+                        deleteBtn.addEventListener('click', function() {
+                            deleteChat(chatId);
+                        });
+                        
+                        chatList.appendChild(chatItem);
+                    }
+                });
+            }
+            
+            function loadCurrentChat() {
+                if (!chats[currentChatId]) {
+                    chats[currentChatId] = {
+                        name: 'Huidige chat',
+                        messages: [
+                            { message: 'Hallo! Ik ben je slimme chatbot. Stel me een vraag en ik help je graag!', sender: 'bot', timestamp: new Date().toISOString() }
+                        ]
+                    };
+                    localStorage.setItem('chats', JSON.stringify(chats));
+                }
+                
+                renderChatHistory();
+            }
+            
+            function renderChatHistory() {
                 chatHistory.innerHTML = '';
+                const messages = chats[currentChatId].messages;
                 
-                // Toon alleen de laatste 30 berichten
-                const recentHistory = chatHistoryData.slice(-30);
-                
-                recentHistory.forEach(item => {
+                messages.forEach(item => {
                     addMessageToChat(item.message, item.sender, item.analysis);
                 });
                 
-                // Scroll naar beneden
                 scrollToBottom();
             }
             
@@ -887,33 +1058,29 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 // Voeg gebruikersbericht toe aan chat
                 addMessageToChat(message, 'user');
                 
-                // Sla bericht op in geschiedenis
-                chatHistoryData.push({
+                // Sla bericht op in huidige chat
+                chats[currentChatId].messages.push({
                     message: message,
                     sender: 'user',
                     timestamp: new Date().toISOString()
                 });
                 
-                // Beperk geschiedenis tot 30 berichten
-                if (chatHistoryData.length > 30) {
-                    chatHistoryData = chatHistoryData.slice(-30);
-                }
+                localStorage.setItem('chats', JSON.stringify(chats));
                 
                 // Simuleer denktijd
                 setTimeout(() => {
                     const response = generateBotResponse(message);
                     addMessageToChat(response.answer, 'bot', response.analysis);
                     
-                    // Sla botbericht op in geschiedenis
-                    chatHistoryData.push({
+                    // Sla botbericht op in huidige chat
+                    chats[currentChatId].messages.push({
                         message: response.answer,
                         sender: 'bot',
                         analysis: showAnalysis ? response.analysis : null,
                         timestamp: new Date().toISOString()
                     });
                     
-                    // Update lokale opslag
-                    localStorage.setItem('chatHistory', JSON.stringify(chatHistoryData));
+                    localStorage.setItem('chats', JSON.stringify(chats));
                 }, 1000 + Math.random() * 1000);
             }
             
@@ -979,7 +1146,6 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 let bestMatch = null;
                 let highestSimilarity = 0;
                 
-                // Eenvoudige similariteitsmeting op basis van gemeenschappelijke woorden
                 const messageWords = message.toLowerCase().split(/\s+/);
                 
                 knowledgeBase.forEach(item => {
@@ -1008,46 +1174,34 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                     "Dat is een interessante vraag. Kun je wat meer details geven?",
                     "Hmm, daar heb ik niet direct een antwoord op. Misschien kan ik je op een andere manier helpen?",
                     "Interessant! Ik ben nog aan het leren, dus ik weet hier niet direct het antwoord op.",
-                    "Kun je je vraag anders formuleren? Dan kan ik beter helpen.",
-                    "Daar zou ik meer over moeten leren. Wil je dat ik iets anders voor je opzoek?"
+                    "Kun je je vraag anders formuleren? Dan kan ik beter helpen."
                 ];
                 
                 return responses[Math.floor(Math.random() * responses.length)];
             }
             
             function saveToKnowledgeBase(question, answer) {
-                // Controleer of deze vraag al bestaat
                 const existingIndex = knowledgeBase.findIndex(item => 
                     item.question.toLowerCase() === question.toLowerCase()
                 );
                 
                 if (existingIndex !== -1) {
-                    // Vervang bestaande vraag
                     knowledgeBase[existingIndex].answer = answer;
                 } else {
-                    // Voeg nieuwe vraag toe
-                    knowledgeBase.push({
-                        question: question,
-                        answer: answer
-                    });
+                    knowledgeBase.push({ question, answer });
                 }
                 
                 localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 
                 // Toon bevestiging
-                const confirmation = document.createElement('div');
-                confirmation.classList.add('message', 'bot-message');
-                confirmation.innerHTML = `<div class="typing-animation">Bedankt! Ik heb geleerd: "${question}" -> "${answer}"</div>`;
-                chatHistory.appendChild(confirmation);
-                
-                // Sla op in geschiedenis
-                chatHistoryData.push({
+                addMessageToChat(`Bedankt! Ik heb geleerd: "${question}" -> "${answer}"`, 'bot');
+                chats[currentChatId].messages.push({
                     message: `Bedankt! Ik heb geleerd: "${question}" -> "${answer}"`,
                     sender: 'bot',
                     timestamp: new Date().toISOString()
                 });
                 
-                scrollToBottom();
+                localStorage.setItem('chats', JSON.stringify(chats));
             }
             
             function parseMultipleQA(text) {
@@ -1083,25 +1237,22 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                     );
                     
                     if (existingIndex !== -1) {
-                        // Vervang bestaande vraag
                         knowledgeBase[existingIndex].answer = qa.answer;
                         updatedCount++;
                     } else {
-                        // Voeg nieuwe vraag toe
                         knowledgeBase.push(qa);
                         importedCount++;
                     }
                 });
                 
                 localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
-                
                 return { importedCount, updatedCount };
             }
             
             async function loadFromGithub(url) {
                 try {
                     githubStatus.innerHTML = '<div class="loading"></div> Reacties laden van GitHub...';
-                    loadGithubBtn.disabled = true;
+                    loadGithub.disabled = true;
                     
                     const response = await fetch(url);
                     
@@ -1118,25 +1269,84 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                         githubModal.classList.remove('open');
                         overlay.classList.remove('open');
                         
-                        // Toon samenvatting in chat
-                        const summary = document.createElement('div');
-                        summary.classList.add('message', 'bot-message');
-                        summary.innerHTML = `<div class="typing-animation">GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
-                        chatHistory.appendChild(summary);
-                        
-                        chatHistoryData.push({
+                        addMessageToChat(`GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`, 'bot');
+                        chats[currentChatId].messages.push({
                             message: `GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`,
                             sender: 'bot',
                             timestamp: new Date().toISOString()
                         });
                         
-                        scrollToBottom();
+                        localStorage.setItem('chats', JSON.stringify(chats));
                     }, 1500);
                     
                 } catch (error) {
-                    console.error('Fout bij laden van GitHub:', error);
-                    githubStatus.innerHTML = `<div style="color: red;">❌ Fout bij laden: ${error.message}. Controleer de URL en probeer opnieuw.</div>`;
-                    loadGithubBtn.disabled = false;
+                    githubStatus.innerHTML = `<div style="color: red;">❌ Fout bij laden: ${error.message}</div>`;
+                    loadGithub.disabled = false;
+                }
+            }
+            
+            function switchToChat(chatId) {
+                // Sla huidige chat op
+                localStorage.setItem('chats', JSON.stringify(chats));
+                
+                // Schakel naar nieuwe chat
+                currentChatId = chatId;
+                renderChatHistory();
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            }
+            
+            function deleteChat(chatId) {
+                if (confirm(`Weet je zeker dat je de chat "${chats[chatId].name}" wilt verwijderen?`)) {
+                    delete chats[chatId];
+                    localStorage.setItem('chats', JSON.stringify(chats));
+                    loadChats();
+                    
+                    if (currentChatId === chatId) {
+                        currentChatId = 'current';
+                        loadCurrentChat();
+                    }
+                }
+            }
+            
+            function startNewChat() {
+                if (chats[currentChatId].messages.length > 1) {
+                    saveChatModal.classList.add('open');
+                } else {
+                    resetCurrentChat();
+                }
+            }
+            
+            function resetCurrentChat() {
+                chats[currentChatId] = {
+                    name: 'Huidige chat',
+                    messages: [
+                        { message: 'Hallo! Ik ben je slimme chatbot. Stel me een vraag en ik help je graag!', sender: 'bot', timestamp: new Date().toISOString() }
+                    ]
+                };
+                localStorage.setItem('chats', JSON.stringify(chats));
+                renderChatHistory();
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            }
+            
+            function saveCurrentChat() {
+                const chatName = chatNameInput.value.trim();
+                if (chatName) {
+                    const newChatId = 'chat_' + Date.now();
+                    chats[newChatId] = {
+                        name: chatName,
+                        messages: [...chats[currentChatId].messages]
+                    };
+                    
+                    resetCurrentChat();
+                    loadChats();
+                    
+                    saveChatModal.classList.remove('open');
+                    overlay.classList.remove('open');
+                    chatNameInput.value = '';
+                } else {
+                    alert('Voer een naam in voor de chat.');
                 }
             }
             
@@ -1154,9 +1364,12 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
             overlay.addEventListener('click', function() {
                 menu.classList.remove('open');
                 overlay.classList.remove('open');
-                teachModal.classList.remove('open');
-                importModal.classList.remove('open');
+                learnChoiceModal.classList.remove('open');
+                singleQuestionModal.classList.remove('open');
+                multipleQuestionsModal.classList.remove('open');
+                importTxtModal.classList.remove('open');
                 githubModal.classList.remove('open');
+                saveChatModal.classList.remove('open');
             });
             
             themeToggle.addEventListener('click', function() {
@@ -1167,74 +1380,118 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
             });
             
             newChatBtn.addEventListener('click', function() {
-                if (chatHistoryData.length > 0) {
-                    if (confirm('Weet je zeker dat je een nieuwe chat wilt starten? De huidige chatgeschiedenis wordt gewist.')) {
-                        chatHistoryData = [];
-                        localStorage.setItem('chatHistory', JSON.stringify(chatHistoryData));
-                        loadChatHistory();
-                        
-                        // Voeg welkomstbericht toe
-                        addMessageToChat('Hallo! Ik ben je slimme chatbot. Stel me een vraag en ik help je graag!', 'bot');
-                        
-                        menu.classList.remove('open');
-                        overlay.classList.remove('open');
-                    }
-                } else {
-                    menu.classList.remove('open');
-                    overlay.classList.remove('open');
-                }
+                startNewChat();
+                menu.classList.remove('open');
             });
             
             toggleAnalysisBtn.addEventListener('click', function() {
                 showAnalysis = !showAnalysis;
                 updateAnalysisButton();
                 localStorage.setItem('showAnalysis', showAnalysis);
-                
-                // Herlaad chatgeschiedenis om analyse te tonen/verbergen
-                loadChatHistory();
-                
+                renderChatHistory();
                 menu.classList.remove('open');
-                overlay.classList.remove('open');
             });
             
             teachChatbotBtn.addEventListener('click', function() {
-                teachModal.classList.add('open');
+                learnChoiceModal.classList.add('open');
+                menu.classList.remove('open');
+            });
+            
+            // Keuze knoppen
+            singleQuestionBtn.addEventListener('click', function() {
+                learnChoiceModal.classList.remove('open');
+                singleQuestionModal.classList.add('open');
                 document.getElementById('teach-question').value = '';
                 document.getElementById('teach-answer').value = '';
-                document.getElementById('multiple-qa').value = '';
-                menu.classList.remove('open');
             });
             
-            importResponsesBtn.addEventListener('click', function() {
-                importModal.classList.add('open');
+            multipleQuestionsBtn.addEventListener('click', function() {
+                learnChoiceModal.classList.remove('open');
+                multipleQuestionsModal.classList.add('open');
+                document.getElementById('multiple-qa').value = '';
+            });
+            
+            importTxtBtn.addEventListener('click', function() {
+                learnChoiceModal.classList.remove('open');
+                importTxtModal.classList.add('open');
                 fileInput.value = '';
                 fileContent.style.display = 'none';
-                saveImportBtn.disabled = true;
-                menu.classList.remove('open');
+                saveImport.disabled = true;
             });
             
-            loadFromGithubBtn.addEventListener('click', function() {
+            loadGithubBtn.addEventListener('click', function() {
+                learnChoiceModal.classList.remove('open');
                 githubModal.classList.add('open');
-                githubUrlInput.value = defaultGithubUrl;
+                githubUrlInput.value = "https://raw.githubusercontent.com/jimisdebest/ai/main/reacties.txt";
                 githubStatus.innerHTML = '';
-                loadGithubBtn.disabled = false;
-                menu.classList.remove('open');
+                loadGithub.disabled = false;
             });
             
-            closeTeachModal.addEventListener('click', function() {
-                teachModal.classList.remove('open');
+            // Annuleer knoppen
+            cancelLearnChoice.addEventListener('click', function() {
+                learnChoiceModal.classList.remove('open');
             });
             
-            cancelTeachBtn.addEventListener('click', function() {
-                teachModal.classList.remove('open');
+            cancelSingle.addEventListener('click', function() {
+                singleQuestionModal.classList.remove('open');
             });
             
-            cancelImportBtn.addEventListener('click', function() {
-                importModal.classList.remove('open');
+            cancelMultiple.addEventListener('click', function() {
+                multipleQuestionsModal.classList.remove('open');
             });
             
-            cancelGithubBtn.addEventListener('click', function() {
+            cancelImport.addEventListener('click', function() {
+                importTxtModal.classList.remove('open');
+            });
+            
+            cancelGithub.addEventListener('click', function() {
                 githubModal.classList.remove('open');
+            });
+            
+            cancelSaveChat.addEventListener('click', function() {
+                saveChatModal.classList.remove('open');
+            });
+            
+            // Opslaan knoppen
+            saveSingle.addEventListener('click', function() {
+                const question = document.getElementById('teach-question').value.trim();
+                const answer = document.getElementById('teach-answer').value.trim();
+                
+                if (question && answer) {
+                    saveToKnowledgeBase(question, answer);
+                    singleQuestionModal.classList.remove('open');
+                    overlay.classList.remove('open');
+                } else {
+                    alert('Vul zowel een vraag als een antwoord in.');
+                }
+            });
+            
+            saveMultiple.addEventListener('click', function() {
+                const multipleText = document.getElementById('multiple-qa').value.trim();
+                
+                if (multipleText) {
+                    const multipleQA = parseMultipleQA(multipleText);
+                    let savedCount = 0;
+                    
+                    multipleQA.forEach(qa => {
+                        saveToKnowledgeBase(qa.question, qa.answer);
+                        savedCount++;
+                    });
+                    
+                    multipleQuestionsModal.classList.remove('open');
+                    overlay.classList.remove('open');
+                    
+                    addMessageToChat(`Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!`, 'bot');
+                    chats[currentChatId].messages.push({
+                        message: `Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!`,
+                        sender: 'bot',
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem('chats', JSON.stringify(chats));
+                } else {
+                    alert('Voer vraag-antwoord paren in.');
+                }
             });
             
             fileInput.addEventListener('change', function(e) {
@@ -1245,37 +1502,30 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                         currentFileContent = e.target.result;
                         filePreview.textContent = currentFileContent;
                         fileContent.style.display = 'block';
-                        saveImportBtn.disabled = false;
+                        saveImport.disabled = false;
                     };
                     reader.readAsText(file);
                 }
             });
             
-            saveImportBtn.addEventListener('click', function() {
+            saveImport.addEventListener('click', function() {
                 if (currentFileContent) {
                     const result = importFromFile(currentFileContent);
-                    importModal.classList.remove('open');
+                    importTxtModal.classList.remove('open');
                     overlay.classList.remove('open');
                     
-                    // Toon samenvatting
-                    setTimeout(() => {
-                        const summary = document.createElement('div');
-                        summary.classList.add('message', 'bot-message');
-                        summary.innerHTML = `<div class="typing-animation">Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
-                        chatHistory.appendChild(summary);
-                        
-                        chatHistoryData.push({
-                            message: `Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`,
-                            sender: 'bot',
-                            timestamp: new Date().toISOString()
-                        });
-                        
-                        scrollToBottom();
-                    }, 500);
+                    addMessageToChat(`Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`, 'bot');
+                    chats[currentChatId].messages.push({
+                        message: `Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`,
+                        sender: 'bot',
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem('chats', JSON.stringify(chats));
                 }
             });
             
-            loadGithubBtn.addEventListener('click', function() {
+            loadGithub.addEventListener('click', function() {
                 const url = githubUrlInput.value.trim();
                 if (url) {
                     loadFromGithub(url);
@@ -1284,50 +1534,8 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 }
             });
             
-            saveTeachBtn.addEventListener('click', function() {
-                const question = document.getElementById('teach-question').value.trim();
-                const answer = document.getElementById('teach-answer').value.trim();
-                const multipleText = document.getElementById('multiple-qa').value.trim();
-                
-                let savedCount = 0;
-                
-                // Verwerk enkele vraag
-                if (question && answer) {
-                    saveToKnowledgeBase(question, answer);
-                    savedCount++;
-                }
-                
-                // Verwerk meerdere vragen
-                if (multipleText) {
-                    const multipleQA = parseMultipleQA(multipleText);
-                    multipleQA.forEach(qa => {
-                        saveToKnowledgeBase(qa.question, qa.answer);
-                        savedCount++;
-                    });
-                }
-                
-                if (savedCount > 0) {
-                    teachModal.classList.remove('open');
-                    overlay.classList.remove('open');
-                    
-                    // Toon samenvatting
-                    setTimeout(() => {
-                        const summary = document.createElement('div');
-                        summary.classList.add('message', 'bot-message');
-                        summary.innerHTML = `<div class="typing-animation">Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!</div>`;
-                        chatHistory.appendChild(summary);
-                        
-                        chatHistoryData.push({
-                            message: `Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!`,
-                            sender: 'bot',
-                            timestamp: new Date().toISOString()
-                        });
-                        
-                        scrollToBottom();
-                    }, 500);
-                } else {
-                    alert('Vul minstens één vraag en antwoord in (enkele of meerdere).');
-                }
+            saveChat.addEventListener('click', function() {
+                saveCurrentChat();
             });
             
             sendButton.addEventListener('click', function() {
@@ -1336,7 +1544,6 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                     processUserMessage(message);
                     chatInput.value = '';
                     
-                    // Animaties
                     sendButton.classList.add('send-animation');
                     setTimeout(() => {
                         sendButton.classList.remove('send-animation');
