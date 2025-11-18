@@ -494,6 +494,32 @@
             display: none;
         }
 
+        /* GitHub URL input */
+        .github-input-container {
+            margin: 15px 0;
+        }
+
+        .github-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .dark-mode .github-input {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .github-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
         /* Responsive aanpassingen */
         @media (max-width: 768px) {
             .chat-container {
@@ -511,6 +537,22 @@
             .modal-content {
                 padding: 15px;
             }
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -542,6 +584,9 @@
         </div>
         <div class="menu-item" id="import-responses">
             <span>Importeer reacties.txt</span>
+        </div>
+        <div class="menu-item" id="load-from-github">
+            <span>Laad van GitHub</span>
         </div>
     </div>
 
@@ -632,6 +677,35 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
         </div>
     </div>
 
+    <div class="modal" id="github-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Laad reacties van GitHub</div>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <div class="modal-section">
+                <p>Voer de GitHub RAW URL in van het reacties.txt bestand:</p>
+                <div class="github-input-container">
+                    <input type="text" class="github-input" id="github-url" 
+                           placeholder="https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt"
+                           value="https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt">
+                </div>
+                
+                <div class="example-text">
+                    Voorbeeld: https://raw.githubusercontent.com/username/repo/main/reacties.txt
+                </div>
+                
+                <div id="github-status" style="margin-top: 15px;"></div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-github">Annuleren</button>
+                <button class="modal-button save" id="load-github">Laden</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Elementen
@@ -644,16 +718,22 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
             const toggleAnalysisBtn = document.getElementById('toggle-analysis');
             const teachChatbotBtn = document.getElementById('teach-chatbot');
             const importResponsesBtn = document.getElementById('import-responses');
+            const loadFromGithubBtn = document.getElementById('load-from-github');
             const teachModal = document.getElementById('teach-modal');
             const importModal = document.getElementById('import-modal');
+            const githubModal = document.getElementById('github-modal');
             const closeTeachModal = document.querySelector('.close-modal');
             const cancelTeachBtn = document.getElementById('cancel-teach');
             const saveTeachBtn = document.getElementById('save-teach');
             const cancelImportBtn = document.getElementById('cancel-import');
             const saveImportBtn = document.getElementById('save-import');
+            const cancelGithubBtn = document.getElementById('cancel-github');
+            const loadGithubBtn = document.getElementById('load-github');
             const fileInput = document.getElementById('file-input');
             const filePreview = document.getElementById('file-preview');
             const fileContent = document.getElementById('file-content');
+            const githubUrlInput = document.getElementById('github-url');
+            const githubStatus = document.getElementById('github-status');
             const chatInput = document.getElementById('chat-input');
             const sendButton = document.getElementById('send-button');
             const chatHistory = document.getElementById('chat-history');
@@ -664,6 +744,9 @@ Wat is je naam = Ik ben de chatbot!"></textarea>
             let chatHistoryData = JSON.parse(localStorage.getItem('chatHistory')) || [];
             let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [];
             let currentFileContent = '';
+            
+            // Standaard GitHub URL - kan aangepast worden
+            const defaultGithubUrl = "https://raw.githubusercontent.com/jouw-gebruikersnaam/jouw-repository/main/reacties.txt";
             
             // Standaard reacties als knowledgeBase leeg is
             const defaultResponses = `Hoe gaat het = Met mij gaat het goed! Hoe gaat het met jou?
@@ -697,6 +780,9 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                     const defaultQA = parseMultipleQA(defaultResponses);
                     knowledgeBase = defaultQA;
                     localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+                    
+                    // Probeer automatisch van GitHub te laden
+                    autoLoadFromGithub();
                 }
                 
                 // Laad chatgeschiedenis
@@ -704,6 +790,36 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 
                 // Stel analyseweergave in
                 updateAnalysisButton();
+            }
+            
+            async function autoLoadFromGithub() {
+                // Probeer een standaard GitHub URL (kan aangepast worden)
+                const defaultUrls = [
+                    "https://raw.githubusercontent.com/jouw-gebruikersnaam/jouw-repository/main/reacties.txt",
+                    "https://raw.githubusercontent.com/gebruiker/repository/main/reacties.txt"
+                ];
+                
+                for (const url of defaultUrls) {
+                    try {
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            const content = await response.text();
+                            const result = importFromFile(content);
+                            
+                            // Toon melding
+                            addMessageToChat(`Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`, 'bot');
+                            chatHistoryData.push({
+                                message: `Automatisch ${result.importedCount} nieuwe reacties geladen van GitHub!`,
+                                sender: 'bot',
+                                timestamp: new Date().toISOString()
+                            });
+                            
+                            break;
+                        }
+                    } catch (error) {
+                        console.log(`Kon niet laden van ${url}:`, error);
+                    }
+                }
             }
             
             function updateThemeIcon(isDark) {
@@ -982,6 +1098,48 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 return { importedCount, updatedCount };
             }
             
+            async function loadFromGithub(url) {
+                try {
+                    githubStatus.innerHTML = '<div class="loading"></div> Reacties laden van GitHub...';
+                    loadGithubBtn.disabled = true;
+                    
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const content = await response.text();
+                    const result = importFromFile(content);
+                    
+                    githubStatus.innerHTML = `<div style="color: green;">✅ Succesvol geladen! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
+                    
+                    setTimeout(() => {
+                        githubModal.classList.remove('open');
+                        overlay.classList.remove('open');
+                        
+                        // Toon samenvatting in chat
+                        const summary = document.createElement('div');
+                        summary.classList.add('message', 'bot-message');
+                        summary.innerHTML = `<div class="typing-animation">GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
+                        chatHistory.appendChild(summary);
+                        
+                        chatHistoryData.push({
+                            message: `GitHub import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`,
+                            sender: 'bot',
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        scrollToBottom();
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Fout bij laden van GitHub:', error);
+                    githubStatus.innerHTML = `<div style="color: red;">❌ Fout bij laden: ${error.message}. Controleer de URL en probeer opnieuw.</div>`;
+                    loadGithubBtn.disabled = false;
+                }
+            }
+            
             // Event listeners
             menuToggle.addEventListener('click', function() {
                 menu.classList.add('open');
@@ -998,6 +1156,7 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 overlay.classList.remove('open');
                 teachModal.classList.remove('open');
                 importModal.classList.remove('open');
+                githubModal.classList.remove('open');
             });
             
             themeToggle.addEventListener('click', function() {
@@ -1054,6 +1213,14 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                 menu.classList.remove('open');
             });
             
+            loadFromGithubBtn.addEventListener('click', function() {
+                githubModal.classList.add('open');
+                githubUrlInput.value = defaultGithubUrl;
+                githubStatus.innerHTML = '';
+                loadGithubBtn.disabled = false;
+                menu.classList.remove('open');
+            });
+            
             closeTeachModal.addEventListener('click', function() {
                 teachModal.classList.remove('open');
             });
@@ -1064,6 +1231,10 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
             
             cancelImportBtn.addEventListener('click', function() {
                 importModal.classList.remove('open');
+            });
+            
+            cancelGithubBtn.addEventListener('click', function() {
+                githubModal.classList.remove('open');
             });
             
             fileInput.addEventListener('change', function(e) {
@@ -1101,6 +1272,15 @@ Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
                         
                         scrollToBottom();
                     }, 500);
+                }
+            });
+            
+            loadGithubBtn.addEventListener('click', function() {
+                const url = githubUrlInput.value.trim();
+                if (url) {
+                    loadFromGithub(url);
+                } else {
+                    githubStatus.innerHTML = '<div style="color: red;">❌ Voer een geldige GitHub URL in.</div>';
                 }
             });
             
