@@ -334,9 +334,11 @@
             border-radius: 12px;
             padding: 25px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             box-shadow: var(--shadow);
             animation: fadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-header {
@@ -380,6 +382,41 @@
             border-color: var(--primary-color);
         }
 
+        .modal-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: var(--transition);
+            min-height: 150px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .dark-mode .modal-textarea {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-section {
+            margin: 20px 0;
+        }
+
+        .modal-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
@@ -410,6 +447,13 @@
             opacity: 0.9;
         }
 
+        .example-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         /* Overlay voor menu */
         .overlay {
             display: none;
@@ -426,6 +470,30 @@
             display: block;
         }
 
+        /* File input styling */
+        .file-input-container {
+            margin: 15px 0;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .file-input-label:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .file-input {
+            display: none;
+        }
+
         /* Responsive aanpassingen */
         @media (max-width: 768px) {
             .chat-container {
@@ -438,6 +506,10 @@
             
             .menu {
                 width: 250px;
+            }
+            
+            .modal-content {
+                padding: 15px;
             }
         }
     </style>
@@ -468,6 +540,9 @@
         <div class="menu-item" id="teach-chatbot">
             <span>Leer de chatbot</span>
         </div>
+        <div class="menu-item" id="import-responses">
+            <span>Importeer reacties.txt</span>
+        </div>
     </div>
 
     <div class="container">
@@ -494,13 +569,65 @@
                 <div class="modal-title">Leer de chatbot</div>
                 <button class="close-modal">×</button>
             </div>
-            <p>Dit is mijn vraag:</p>
-            <input type="text" class="modal-input" id="teach-question" placeholder="Typ je vraag hier...">
-            <p>Dit is het antwoord op die vraag:</p>
-            <input type="text" class="modal-input" id="teach-answer" placeholder="Typ het antwoord hier...">
+            
+            <div class="modal-section">
+                <div class="modal-section-title">Enkele vraag toevoegen</div>
+                <p>Dit is mijn vraag:</p>
+                <input type="text" class="modal-input" id="teach-question" placeholder="Typ je vraag hier...">
+                <p>Dit is het antwoord op die vraag:</p>
+                <input type="text" class="modal-input" id="teach-answer" placeholder="Typ het antwoord hier...">
+            </div>
+            
+            <div class="modal-section">
+                <div class="modal-section-title">Of voeg hier snel meerdere toe</div>
+                <p>Voeg meerdere vraag-antwoord paren toe in dit formaat:</p>
+                <textarea class="modal-textarea" id="multiple-qa" placeholder="Vraag = Antwoord
+Bijvoorbeeld:
+Hoe gaat het = Met mij gaat het goed!
+Wat is je naam = Ik ben de chatbot!"></textarea>
+                <div class="example-text">
+                    Formaat: elke regel bevat een vraag, gevolgd door " = " en dan het antwoord.
+                </div>
+            </div>
+            
             <div class="modal-buttons">
                 <button class="modal-button cancel" id="cancel-teach">Annuleren</button>
                 <button class="modal-button save" id="save-teach">Opslaan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Importeer reacties.txt</div>
+                <button class="close-modal">×</button>
+            </div>
+            
+            <div class="modal-section">
+                <p>Upload een reacties.txt bestand met vraag-antwoord paren in dit formaat:</p>
+                <div class="example-text">
+                    Vraag = Antwoord<br>
+                    Vraag = Antwoord<br>
+                    ...
+                </div>
+                
+                <div class="file-input-container">
+                    <label for="file-input" class="file-input-label">
+                        Kies reacties.txt bestand
+                    </label>
+                    <input type="file" id="file-input" class="file-input" accept=".txt">
+                </div>
+                
+                <div id="file-content" style="display: none; margin-top: 15px;">
+                    <div class="modal-section-title">Voorbeeld van geïmporteerde reacties:</div>
+                    <div id="file-preview" class="modal-textarea" style="min-height: 100px; background-color: rgba(0,0,0,0.05);"></div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-import">Annuleren</button>
+                <button class="modal-button save" id="save-import" disabled>Importeer</button>
             </div>
         </div>
     </div>
@@ -516,10 +643,17 @@
             const newChatBtn = document.getElementById('new-chat');
             const toggleAnalysisBtn = document.getElementById('toggle-analysis');
             const teachChatbotBtn = document.getElementById('teach-chatbot');
+            const importResponsesBtn = document.getElementById('import-responses');
             const teachModal = document.getElementById('teach-modal');
+            const importModal = document.getElementById('import-modal');
             const closeTeachModal = document.querySelector('.close-modal');
             const cancelTeachBtn = document.getElementById('cancel-teach');
             const saveTeachBtn = document.getElementById('save-teach');
+            const cancelImportBtn = document.getElementById('cancel-import');
+            const saveImportBtn = document.getElementById('save-import');
+            const fileInput = document.getElementById('file-input');
+            const filePreview = document.getElementById('file-preview');
+            const fileContent = document.getElementById('file-content');
             const chatInput = document.getElementById('chat-input');
             const sendButton = document.getElementById('send-button');
             const chatHistory = document.getElementById('chat-history');
@@ -528,12 +662,23 @@
             let isDarkMode = localStorage.getItem('darkMode') === 'true';
             let showAnalysis = localStorage.getItem('showAnalysis') !== 'false';
             let chatHistoryData = JSON.parse(localStorage.getItem('chatHistory')) || [];
-            let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [
-                { question: "Hoe gaat het?", answer: "Met mij gaat het goed, bedankt! Hoe gaat het met jou?" },
-                { question: "Wat is je naam?", answer: "Ik ben de Slimme Chatbot, aangenaam kennis te maken!" },
-                { question: "Wat kun je doen?", answer: "Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu." }
-            ];
+            let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [];
+            let currentFileContent = '';
             
+            // Standaard reacties als knowledgeBase leeg is
+            const defaultResponses = `Hoe gaat het = Met mij gaat het goed! Hoe gaat het met jou?
+Wat is je naam = Ik ben de Slimme Chatbot, aangenaam kennis te maken!
+Wat kun je doen = Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu.
+Hallo = Hallo! Waar wilt u het over hebben?
+Hoi = Hoi! Goed je te zien!
+Hey = Hey daar!
+Wie heeft je gemaakt = Ik ben gemaakt door een getalenteerde ontwikkelaar!
+Wat is de betekenis van het leven = Dat is een diepe vraag! Ik denk dat het leven draait om leren, groeien en verbinden met anderen.
+Vertel me een grap = Waarom konden de computers niet naar de feest? Omdat ze te veel bugs hadden!
+Help = Ik kan je helpen met het beantwoorden van vragen. Stel me gewoon een vraag en ik zal mijn best doen!
+Dankjewel = Graag gedaan! Blijf vragen stellen!
+Tot ziens = Tot ziens! Hopelijk spreken we snel weer!`;
+
             // Initialiseer de interface
             initializeInterface();
             
@@ -545,6 +690,13 @@
                     updateThemeIcon(true);
                 } else {
                     updateThemeIcon(false);
+                }
+                
+                // Laad knowledge base of gebruik standaard
+                if (knowledgeBase.length === 0) {
+                    const defaultQA = parseMultipleQA(defaultResponses);
+                    knowledgeBase = defaultQA;
+                    localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 }
                 
                 // Laad chatgeschiedenis
@@ -748,10 +900,21 @@
             }
             
             function saveToKnowledgeBase(question, answer) {
-                knowledgeBase.push({
-                    question: question,
-                    answer: answer
-                });
+                // Controleer of deze vraag al bestaat
+                const existingIndex = knowledgeBase.findIndex(item => 
+                    item.question.toLowerCase() === question.toLowerCase()
+                );
+                
+                if (existingIndex !== -1) {
+                    // Vervang bestaande vraag
+                    knowledgeBase[existingIndex].answer = answer;
+                } else {
+                    // Voeg nieuwe vraag toe
+                    knowledgeBase.push({
+                        question: question,
+                        answer: answer
+                    });
+                }
                 
                 localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
                 
@@ -771,6 +934,54 @@
                 scrollToBottom();
             }
             
+            function parseMultipleQA(text) {
+                const lines = text.split('\n');
+                const results = [];
+                
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line && line.includes('=')) {
+                        const parts = line.split('=');
+                        if (parts.length >= 2) {
+                            const question = parts[0].trim();
+                            const answer = parts.slice(1).join('=').trim();
+                            
+                            if (question && answer) {
+                                results.push({ question, answer });
+                            }
+                        }
+                    }
+                });
+                
+                return results;
+            }
+            
+            function importFromFile(content) {
+                const importedQA = parseMultipleQA(content);
+                let importedCount = 0;
+                let updatedCount = 0;
+                
+                importedQA.forEach(qa => {
+                    const existingIndex = knowledgeBase.findIndex(item => 
+                        item.question.toLowerCase() === qa.question.toLowerCase()
+                    );
+                    
+                    if (existingIndex !== -1) {
+                        // Vervang bestaande vraag
+                        knowledgeBase[existingIndex].answer = qa.answer;
+                        updatedCount++;
+                    } else {
+                        // Voeg nieuwe vraag toe
+                        knowledgeBase.push(qa);
+                        importedCount++;
+                    }
+                });
+                
+                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+                
+                return { importedCount, updatedCount };
+            }
+            
             // Event listeners
             menuToggle.addEventListener('click', function() {
                 menu.classList.add('open');
@@ -786,6 +997,7 @@
                 menu.classList.remove('open');
                 overlay.classList.remove('open');
                 teachModal.classList.remove('open');
+                importModal.classList.remove('open');
             });
             
             themeToggle.addEventListener('click', function() {
@@ -830,6 +1042,15 @@
                 teachModal.classList.add('open');
                 document.getElementById('teach-question').value = '';
                 document.getElementById('teach-answer').value = '';
+                document.getElementById('multiple-qa').value = '';
+                menu.classList.remove('open');
+            });
+            
+            importResponsesBtn.addEventListener('click', function() {
+                importModal.classList.add('open');
+                fileInput.value = '';
+                fileContent.style.display = 'none';
+                saveImportBtn.disabled = true;
                 menu.classList.remove('open');
             });
             
@@ -841,16 +1062,91 @@
                 teachModal.classList.remove('open');
             });
             
+            cancelImportBtn.addEventListener('click', function() {
+                importModal.classList.remove('open');
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentFileContent = e.target.result;
+                        filePreview.textContent = currentFileContent;
+                        fileContent.style.display = 'block';
+                        saveImportBtn.disabled = false;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+            
+            saveImportBtn.addEventListener('click', function() {
+                if (currentFileContent) {
+                    const result = importFromFile(currentFileContent);
+                    importModal.classList.remove('open');
+                    overlay.classList.remove('open');
+                    
+                    // Toon samenvatting
+                    setTimeout(() => {
+                        const summary = document.createElement('div');
+                        summary.classList.add('message', 'bot-message');
+                        summary.innerHTML = `<div class="typing-animation">Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.</div>`;
+                        chatHistory.appendChild(summary);
+                        
+                        chatHistoryData.push({
+                            message: `Import voltooid! ${result.importedCount} nieuwe reacties toegevoegd, ${result.updatedCount} reacties bijgewerkt.`,
+                            sender: 'bot',
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        scrollToBottom();
+                    }, 500);
+                }
+            });
+            
             saveTeachBtn.addEventListener('click', function() {
                 const question = document.getElementById('teach-question').value.trim();
                 const answer = document.getElementById('teach-answer').value.trim();
+                const multipleText = document.getElementById('multiple-qa').value.trim();
                 
+                let savedCount = 0;
+                
+                // Verwerk enkele vraag
                 if (question && answer) {
                     saveToKnowledgeBase(question, answer);
+                    savedCount++;
+                }
+                
+                // Verwerk meerdere vragen
+                if (multipleText) {
+                    const multipleQA = parseMultipleQA(multipleText);
+                    multipleQA.forEach(qa => {
+                        saveToKnowledgeBase(qa.question, qa.answer);
+                        savedCount++;
+                    });
+                }
+                
+                if (savedCount > 0) {
                     teachModal.classList.remove('open');
                     overlay.classList.remove('open');
+                    
+                    // Toon samenvatting
+                    setTimeout(() => {
+                        const summary = document.createElement('div');
+                        summary.classList.add('message', 'bot-message');
+                        summary.innerHTML = `<div class="typing-animation">Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!</div>`;
+                        chatHistory.appendChild(summary);
+                        
+                        chatHistoryData.push({
+                            message: `Ik heb ${savedCount} nieuwe vraag-antwoord combinatie(s) geleerd!`,
+                            sender: 'bot',
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        scrollToBottom();
+                    }, 500);
                 } else {
-                    alert('Vul zowel een vraag als een antwoord in.');
+                    alert('Vul minstens één vraag en antwoord in (enkele of meerdere).');
                 }
             });
             
