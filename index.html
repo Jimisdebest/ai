@@ -1,191 +1,879 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Chat</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slimme Chatbot</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --background-color: #f5f5f5;
+            --surface-color: #ffffff;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-image: url('Licht.png');
-      background-size: cover;
-      background-position: center;
-      transition: background-image 0.3s ease, color 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
+        .dark-mode {
+            --primary-color: #6b8cbc;
+            --secondary-color: #4a6fa5;
+            --background-color: #1a1a1a;
+            --surface-color: #2d2d2d;
+            --text-color: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
 
-    body.dark {
-      background-image: url('Donker.png');
-      color: white;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 0 0 20px 20px;
-    }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    body.dark .top-bar {
-      background: rgba(0,0,0,0.6);
-    }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
 
-    .chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 20px;
-      overflow-y: auto;
-    }
+        /* Header en menu */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 100;
+        }
 
-    .message {
-      max-width: 70%;
-      margin-bottom: 10px;
-      padding: 12px 16px;
-      border-radius: 20px;
-      animation: fadeIn 0.3s ease-in-out;
-    }
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
 
-    .user {
-      align-self: flex-end;
-      background-color: #0078d4;
-      color: white;
-    }
+        .menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-    .ai {
-      align-self: flex-start;
-      background-color: #e5e7eb;
-      color: #333;
-    }
+        .menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--surface-color);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            z-index: 200;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
 
-    body.dark .ai {
-      background-color: #333;
-      color: white;
-    }
+        .menu.open {
+            left: 0;
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--text-secondary);
+        }
 
-    .input-bar {
-      display: flex;
-      padding: 10px;
-      background: white;
-      border-top: 1px solid #ccc;
-      border-radius: 0 0 20px 20px;
-    }
+        .menu-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
 
-    body.dark .input-bar {
-      background: #2c2c2c;
-    }
+        .close-menu {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
 
-    input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      font-size: 16px;
-      outline: none;
-    }
+        .menu-item {
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    button {
-      margin-left: 10px;
-      padding: 10px 16px;
-      background-color: #0078d4;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-    }
+        .menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
 
-    button:hover {
-      background-color: #005fa3;
-    }
-  </style>
+        .dark-mode .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-icon {
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .light-icon {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM6.34 5.16l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41-.38-.39-1.02-.39-1.41 0zm12.73 12.73l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41-.38-.39-1.02-.39-1.41 0zM4.93 19.07l1.42-1.42c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.38.39 1.02.39 1.41 0zm12.73-12.73l1.42-1.42c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39-1.02 0-1.41.38-.39 1.02-.39 1.41 0z"/></svg>');
+        }
+
+        .dark-icon {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fff"><path d="M9.37 5.51A7.35 7.35 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27A7.014 7.014 0 0 1 12 19c-3.86 0-7-3.14-7-7 0-2.93 1.81-5.45 4.37-6.49zM12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>');
+        }
+
+        /* Chat gebied */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 70px);
+            padding: 20px;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--surface-color);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+
+        .dark-mode .bot-message {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .analysis {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .dark-mode .analysis {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .dark-mode .chat-input {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .send-button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .send-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Animaties */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes sendAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid var(--primary-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typewriter 2s steps(40, end);
+        }
+
+        .send-animation {
+            animation: sendAnimation 0.3s ease;
+        }
+
+        /* Modal voor leerfunctie */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .dark-mode .modal-input {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .modal-button.cancel {
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .modal-button.save {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Overlay voor menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+        }
+
+        .overlay.open {
+            display: block;
+        }
+
+        /* Responsive aanpassingen */
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 10px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .menu {
+                width: 250px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="top-bar">
-    <button onclick="window.location.href='leer.html'">Leer de AI</button>
-    <button onclick="toggleTheme()">🌗 Thema wisselen</button>
-  </div>
+    <div class="header">
+        <button class="menu-toggle">☰</button>
+        <h1>Slimme Chatbot</h1>
+    </div>
 
-  <div class="chat-container" id="chat"></div>
+    <div class="overlay"></div>
 
-  <div class="input-bar">
-    <input type="text" id="input" placeholder="Typ hier je bericht..." />
-    <button onclick="verstuur()">Verstuur</button>
-  </div>
+    <div class="menu">
+        <div class="menu-header">
+            <div class="menu-title">Menu</div>
+            <button class="close-menu">×</button>
+        </div>
+        <div class="menu-item" id="new-chat">
+            <span>Nieuwe chat</span>
+        </div>
+        <div class="menu-item theme-toggle" id="theme-toggle">
+            <div class="theme-icon light-icon"></div>
+            <span>Donker / Licht modus</span>
+        </div>
+        <div class="menu-item" id="toggle-analysis">
+            <span>Analyse weergeven</span>
+        </div>
+        <div class="menu-item" id="teach-chatbot">
+            <span>Leer de chatbot</span>
+        </div>
+    </div>
 
-  <script>
-  // Thema toepassen bij laden
-  if (localStorage.getItem("thema") === "donker") {
-    document.body.classList.add("dark");
-  }
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-history" id="chat-history">
+                <div class="message bot-message">
+                    Hallo! Ik ben je slimme chatbot. Stel me een vraag en ik help je graag!
+                </div>
+            </div>
+            <div class="input-container">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Typ je bericht hier...">
+                <button class="send-button" id="send-button">
+                    <svg class="send-icon" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
-  let reacties = JSON.parse(localStorage.getItem("reacties")) || {};
+    <div class="modal" id="teach-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Leer de chatbot</div>
+                <button class="close-modal">×</button>
+            </div>
+            <p>Dit is mijn vraag:</p>
+            <input type="text" class="modal-input" id="teach-question" placeholder="Typ je vraag hier...">
+            <p>Dit is het antwoord op die vraag:</p>
+            <input type="text" class="modal-input" id="teach-answer" placeholder="Typ het antwoord hier...">
+            <div class="modal-buttons">
+                <button class="modal-button cancel" id="cancel-teach">Annuleren</button>
+                <button class="modal-button save" id="save-teach">Opslaan</button>
+            </div>
+        </div>
+    </div>
 
-  function normaliseer(tekst) {
-    return tekst
-      .toLowerCase()
-      .normalize("NFD") // splits diacritics
-      .replace(/[\u0300-\u036f]/g, "") // verwijder diacritics
-      .replace(/[^a-z0-9 ]/g, "") // verwijder speciale tekens
-      .replace(/\s+/g, " ") // vervang meerdere spaties door één
-      .trim(); // verwijder spaties aan begin/eind
-  }
-
-  function voegBerichtToe(tekst, klasse) {
-    const chat = document.getElementById("chat");
-    const msg = document.createElement("div");
-    msg.className = `message ${klasse}`;
-    msg.textContent = tekst;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  function verstuur() {
-    const input = document.getElementById("input");
-    const origineleTekst = input.value;
-    const sleutel = normaliseer(origineleTekst);
-    if (!sleutel) return;
-
-    voegBerichtToe(origineleTekst, "user");
-    input.value = "";
-
-    setTimeout(() => {
-      const reactie = reacties[sleutel] || "Dat weet ik nog niet, maar ik leer graag bij!";
-      voegBerichtToe(reactie, "ai");
-      spreek(reactie);
-    }, 400);
-  }
-
-  document.getElementById("input").addEventListener("keypress", function(e) {
-    if (e.key === "Enter" && this.value.trim() !== "") {
-      e.preventDefault();
-      verstuur();
-    }
-  });
-
-  function toggleTheme() {
-    document.body.classList.toggle("dark");
-    const huidigThema = document.body.classList.contains("dark") ? "donker" : "licht";
-    localStorage.setItem("thema", huidigThema);
-  }
-
-  function spreek(tekst) {
-    const msg = new SpeechSynthesisUtterance(tekst);
-    speechSynthesis.speak(msg);
-  }
-</script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementen
+            const menuToggle = document.querySelector('.menu-toggle');
+            const closeMenu = document.querySelector('.close-menu');
+            const menu = document.querySelector('.menu');
+            const overlay = document.querySelector('.overlay');
+            const themeToggle = document.getElementById('theme-toggle');
+            const newChatBtn = document.getElementById('new-chat');
+            const toggleAnalysisBtn = document.getElementById('toggle-analysis');
+            const teachChatbotBtn = document.getElementById('teach-chatbot');
+            const teachModal = document.getElementById('teach-modal');
+            const closeTeachModal = document.querySelector('.close-modal');
+            const cancelTeachBtn = document.getElementById('cancel-teach');
+            const saveTeachBtn = document.getElementById('save-teach');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const chatHistory = document.getElementById('chat-history');
+            
+            // Status variabelen
+            let isDarkMode = localStorage.getItem('darkMode') === 'true';
+            let showAnalysis = localStorage.getItem('showAnalysis') !== 'false';
+            let chatHistoryData = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            let knowledgeBase = JSON.parse(localStorage.getItem('knowledgeBase')) || [
+                { question: "Hoe gaat het?", answer: "Met mij gaat het goed, bedankt! Hoe gaat het met jou?" },
+                { question: "Wat is je naam?", answer: "Ik ben de Slimme Chatbot, aangenaam kennis te maken!" },
+                { question: "Wat kun je doen?", answer: "Ik kan vragen beantwoorden, gesprekken voeren en nieuwe dingen leren via het menu." }
+            ];
+            
+            // Initialiseer de interface
+            initializeInterface();
+            
+            // Functies
+            function initializeInterface() {
+                // Stel thema in
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    updateThemeIcon(true);
+                } else {
+                    updateThemeIcon(false);
+                }
+                
+                // Laad chatgeschiedenis
+                loadChatHistory();
+                
+                // Stel analyseweergave in
+                updateAnalysisButton();
+            }
+            
+            function updateThemeIcon(isDark) {
+                const themeIcon = themeToggle.querySelector('.theme-icon');
+                if (isDark) {
+                    themeIcon.classList.remove('light-icon');
+                    themeIcon.classList.add('dark-icon');
+                    themeToggle.querySelector('span').textContent = 'Licht modus';
+                } else {
+                    themeIcon.classList.remove('dark-icon');
+                    themeIcon.classList.add('light-icon');
+                    themeToggle.querySelector('span').textContent = 'Donker modus';
+                }
+            }
+            
+            function updateAnalysisButton() {
+                if (showAnalysis) {
+                    toggleAnalysisBtn.querySelector('span').textContent = 'Analyse verbergen';
+                } else {
+                    toggleAnalysisBtn.querySelector('span').textContent = 'Analyse weergeven';
+                }
+            }
+            
+            function loadChatHistory() {
+                chatHistory.innerHTML = '';
+                
+                // Toon alleen de laatste 30 berichten
+                const recentHistory = chatHistoryData.slice(-30);
+                
+                recentHistory.forEach(item => {
+                    addMessageToChat(item.message, item.sender, item.analysis);
+                });
+                
+                // Scroll naar beneden
+                scrollToBottom();
+            }
+            
+            function addMessageToChat(message, sender, analysis = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                
+                if (sender === 'bot') {
+                    messageDiv.innerHTML = `<div class="typing-animation">${message}</div>`;
+                    
+                    if (showAnalysis && analysis) {
+                        const analysisDiv = document.createElement('div');
+                        analysisDiv.classList.add('analysis');
+                        analysisDiv.innerHTML = analysis;
+                        messageDiv.appendChild(analysisDiv);
+                    }
+                } else {
+                    messageDiv.textContent = message;
+                }
+                
+                chatHistory.appendChild(messageDiv);
+                scrollToBottom();
+            }
+            
+            function scrollToBottom() {
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+            
+            function processUserMessage(message) {
+                // Voeg gebruikersbericht toe aan chat
+                addMessageToChat(message, 'user');
+                
+                // Sla bericht op in geschiedenis
+                chatHistoryData.push({
+                    message: message,
+                    sender: 'user',
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Beperk geschiedenis tot 30 berichten
+                if (chatHistoryData.length > 30) {
+                    chatHistoryData = chatHistoryData.slice(-30);
+                }
+                
+                // Simuleer denktijd
+                setTimeout(() => {
+                    const response = generateBotResponse(message);
+                    addMessageToChat(response.answer, 'bot', response.analysis);
+                    
+                    // Sla botbericht op in geschiedenis
+                    chatHistoryData.push({
+                        message: response.answer,
+                        sender: 'bot',
+                        analysis: showAnalysis ? response.analysis : null,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Update lokale opslag
+                    localStorage.setItem('chatHistory', JSON.stringify(chatHistoryData));
+                }, 1000 + Math.random() * 1000);
+            }
+            
+            function generateBotResponse(message) {
+                const startTime = Date.now();
+                let analysis = '';
+                
+                // Stap 1: Zoek naar exacte overeenkomst
+                analysis += "Zoeken naar exacte overeenkomst...<br>";
+                const exactMatch = knowledgeBase.find(item => 
+                    item.question.toLowerCase() === message.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                    analysis += "<strong>Exacte overeenkomst gevonden. Antwoord geven aan gebruiker.</strong><br>";
+                } else {
+                    analysis += "Geen exacte overeenkomst gevonden.<br>";
+                    
+                    // Stap 2: Zoek naar beste overeenkomst
+                    analysis += "Zoeken naar vraag met meeste overeenkomst...<br>";
+                    const bestMatch = findBestMatch(message);
+                    
+                    if (bestMatch) {
+                        analysis += `Deze vraag is gevonden: "${bestMatch.question}"<br>`;
+                        analysis += `Hij heeft ${bestMatch.similarity}% overeenkomst.<br>`;
+                        analysis += "<strong>Antwoord geven aan gebruiker.</strong><br>";
+                    } else {
+                        analysis += "Geen goede overeenkomst gevonden.<br>";
+                        analysis += "<strong>Standaard antwoord geven.</strong><br>";
+                    }
+                }
+                
+                // Bepaal hoe de vraag wordt opgevat
+                if (message.includes('?')) {
+                    analysis += "Opgevat als: Vraag<br>";
+                } else if (message.trim().length === 0) {
+                    analysis += "Opgevat als: Leeg bericht<br>";
+                } else {
+                    analysis += "Opgevat als: Niet kunnen opvatten<br>";
+                }
+                
+                // Bereken denktijd
+                const endTime = Date.now();
+                const thinkTime = (endTime - startTime) / 1000;
+                analysis += `<br>Totale denktijd: ${thinkTime.toFixed(2)} seconden`;
+                
+                // Bepaal antwoord
+                let answer;
+                if (exactMatch) {
+                    answer = exactMatch.answer;
+                } else {
+                    const bestMatch = findBestMatch(message);
+                    answer = bestMatch ? bestMatch.answer : getDefaultResponse();
+                }
+                
+                return {
+                    answer: answer,
+                    analysis: analysis
+                };
+            }
+            
+            function findBestMatch(message) {
+                let bestMatch = null;
+                let highestSimilarity = 0;
+                
+                // Eenvoudige similariteitsmeting op basis van gemeenschappelijke woorden
+                const messageWords = message.toLowerCase().split(/\s+/);
+                
+                knowledgeBase.forEach(item => {
+                    const questionWords = item.question.toLowerCase().split(/\s+/);
+                    const commonWords = messageWords.filter(word => 
+                        questionWords.includes(word) && word.length > 2
+                    );
+                    
+                    const similarity = (commonWords.length / Math.max(messageWords.length, questionWords.length)) * 100;
+                    
+                    if (similarity > highestSimilarity && similarity > 30) {
+                        highestSimilarity = similarity;
+                        bestMatch = {
+                            question: item.question,
+                            answer: item.answer,
+                            similarity: Math.round(similarity)
+                        };
+                    }
+                });
+                
+                return bestMatch;
+            }
+            
+            function getDefaultResponse() {
+                const responses = [
+                    "Dat is een interessante vraag. Kun je wat meer details geven?",
+                    "Hmm, daar heb ik niet direct een antwoord op. Misschien kan ik je op een andere manier helpen?",
+                    "Interessant! Ik ben nog aan het leren, dus ik weet hier niet direct het antwoord op.",
+                    "Kun je je vraag anders formuleren? Dan kan ik beter helpen.",
+                    "Daar zou ik meer over moeten leren. Wil je dat ik iets anders voor je opzoek?"
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            function saveToKnowledgeBase(question, answer) {
+                knowledgeBase.push({
+                    question: question,
+                    answer: answer
+                });
+                
+                localStorage.setItem('knowledgeBase', JSON.stringify(knowledgeBase));
+                
+                // Toon bevestiging
+                const confirmation = document.createElement('div');
+                confirmation.classList.add('message', 'bot-message');
+                confirmation.innerHTML = `<div class="typing-animation">Bedankt! Ik heb geleerd: "${question}" -> "${answer}"</div>`;
+                chatHistory.appendChild(confirmation);
+                
+                // Sla op in geschiedenis
+                chatHistoryData.push({
+                    message: `Bedankt! Ik heb geleerd: "${question}" -> "${answer}"`,
+                    sender: 'bot',
+                    timestamp: new Date().toISOString()
+                });
+                
+                scrollToBottom();
+            }
+            
+            // Event listeners
+            menuToggle.addEventListener('click', function() {
+                menu.classList.add('open');
+                overlay.classList.add('open');
+            });
+            
+            closeMenu.addEventListener('click', function() {
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+            
+            overlay.addEventListener('click', function() {
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+                teachModal.classList.remove('open');
+            });
+            
+            themeToggle.addEventListener('click', function() {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                updateThemeIcon(isDarkMode);
+                localStorage.setItem('darkMode', isDarkMode);
+            });
+            
+            newChatBtn.addEventListener('click', function() {
+                if (chatHistoryData.length > 0) {
+                    if (confirm('Weet je zeker dat je een nieuwe chat wilt starten? De huidige chatgeschiedenis wordt gewist.')) {
+                        chatHistoryData = [];
+                        localStorage.setItem('chatHistory', JSON.stringify(chatHistoryData));
+                        loadChatHistory();
+                        
+                        // Voeg welkomstbericht toe
+                        addMessageToChat('Hallo! Ik ben je slimme chatbot. Stel me een vraag en ik help je graag!', 'bot');
+                        
+                        menu.classList.remove('open');
+                        overlay.classList.remove('open');
+                    }
+                } else {
+                    menu.classList.remove('open');
+                    overlay.classList.remove('open');
+                }
+            });
+            
+            toggleAnalysisBtn.addEventListener('click', function() {
+                showAnalysis = !showAnalysis;
+                updateAnalysisButton();
+                localStorage.setItem('showAnalysis', showAnalysis);
+                
+                // Herlaad chatgeschiedenis om analyse te tonen/verbergen
+                loadChatHistory();
+                
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+            
+            teachChatbotBtn.addEventListener('click', function() {
+                teachModal.classList.add('open');
+                document.getElementById('teach-question').value = '';
+                document.getElementById('teach-answer').value = '';
+                menu.classList.remove('open');
+            });
+            
+            closeTeachModal.addEventListener('click', function() {
+                teachModal.classList.remove('open');
+            });
+            
+            cancelTeachBtn.addEventListener('click', function() {
+                teachModal.classList.remove('open');
+            });
+            
+            saveTeachBtn.addEventListener('click', function() {
+                const question = document.getElementById('teach-question').value.trim();
+                const answer = document.getElementById('teach-answer').value.trim();
+                
+                if (question && answer) {
+                    saveToKnowledgeBase(question, answer);
+                    teachModal.classList.remove('open');
+                    overlay.classList.remove('open');
+                } else {
+                    alert('Vul zowel een vraag als een antwoord in.');
+                }
+            });
+            
+            sendButton.addEventListener('click', function() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    processUserMessage(message);
+                    chatInput.value = '';
+                    
+                    // Animaties
+                    sendButton.classList.add('send-animation');
+                    setTimeout(() => {
+                        sendButton.classList.remove('send-animation');
+                    }, 300);
+                }
+            });
+            
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
