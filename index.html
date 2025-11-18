@@ -200,6 +200,10 @@
             border-radius: 18px;
             animation: fadeIn 0.3s ease;
             position: relative;
+            /* Belangrijk: Automatische regelafbreking */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .user-message {
@@ -228,6 +232,10 @@
             font-size: 0.85rem;
             color: var(--text-secondary);
             border-left: 3px solid var(--primary-color);
+            /* Automatische regelafbreking voor analyse ook */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .dark-mode .analysis {
@@ -316,8 +324,9 @@
 
         .typing-animation {
             overflow: hidden;
-            border-right: 2px solid var(--primary-color);
-            white-space: nowrap;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
             margin: 0 auto;
             animation: typewriter 2s steps(40, end);
         }
