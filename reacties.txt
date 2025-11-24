@@ -2719,3 +2719,5 @@ Ik heb een Brainrot God of Compasses = Hij wijst richting.
 Ik heb een Brainrot God of Journeys = Hij begeleidt avonturen.  
 Ik heb een Brainrot God of Stories = Hij vertelt legendes.  
 Ik heb een Brainrot God of Myths = Hij leeft in fabels.  
+
+Ben jij een homo = Ja! Ik als AI ben een homo! Goed geraden!
