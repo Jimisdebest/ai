@@ -1,4 +1,4 @@
-Maak een afbeelding van een aap =  <img src="https://www.wikihow.com/images/3/3a/Insert-Images-with-HTML-Step-6Bullet2-Version-2.jpg" alt="doman de foto">
+Maak een afbeelding van een aap = <img src="https://www.wikihow.com/images/3/3a/Insert-Images-with-HTML-Step-6Bullet2-Version-2.jpg">
 Hey = Hey daar!
 Hallo = Hallo! Waar wilt u het over hebben?
 Hoi = Hoi! Goed je te zien!
