@@ -1,4 +1,4 @@
-toon een aap = Hier is een aap voor je!<br><img src="https://images.unsplash.com/photo-1557318041-1ce374d55ebf?w=400&fit=crop" alt="Een schattige aap" style="max-width: 100%;">
+toon een aap = Hier is een schattige aap voor je!<br><img src="https://images.unsplash.com/photo-1557318041-1ce374d55ebf?w=400&fit=crop" alt="Een schattige aap" style="max-width: 100%; border-radius: 10px;">
 Hey = Hey daar!
 Hallo = Hallo! Waar wilt u het over hebben?
 Hoi = Hoi! Goed je te zien!
