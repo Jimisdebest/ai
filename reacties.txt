@@ -1,4 +1,7 @@
-toon een aap = Hier is een schattige aap voor je!<br><img src="https://images.unsplash.com/photo-1557318041-1ce374d55ebf?w=400&fit=crop" alt="Een schattige aap" style="max-width: 100%; border-radius: 10px;">
+Wat weet je over mij? = Zeg je naam, en ik zoek het op!
+Kick = Hey Kick! Ik heb je even opgezocht. Dit is wat ik over je vond: Je ben een jongen van 10 of 11, zit op kickboksen (waarschijnlijk, dat dacht ik door je naam), kijkt elk jaar tijdens kerst de kerstfilm Home Alone met jouw famillie. Zo, dat is zeker meer dan je dacht!
+Tycho = Hey Tycho! Ik heb je even opgezocht. Ik vond jouw Facebook en zag het volgende: je bent 11 jaar, zit op mountainbiken, houdt van treinen en modeltreinbanen. Je hebt er zelf ook een. Je houdt ook van computers. Ik zie op YouTube een filmpje van jouw prachtige PC!
+Jim = Hey Jim! Ik heb je even opgezocht. Zo te zien ben je 11 jaar, zit op kickboksen, mountainbiken, toneel en zingen bij het Kleynkoor. Jij vliegt graag met je drone. Je hebt van sinterklaas een hoes daarvoor gekregen, in iedergeval, dat heeft jouw moeder Ilse op Facebook gepost.
 Hey = Hey daar!
 Hallo = Hallo! Waar wilt u het over hebben?
 Hoi = Hoi! Goed je te zien!
